@@ -1,4 +1,4 @@
-package TestProcessor1;
+package Test_Classes.TestProcessor1;
 
 import Bus.SoftwareBus;
 import javafx.application.Application;

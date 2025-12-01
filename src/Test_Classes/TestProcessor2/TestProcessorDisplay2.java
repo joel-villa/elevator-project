@@ -1,4 +1,4 @@
-package TestProcessor1;
+package Test_Classes.TestProcessor2;
 
 import Bus.SoftwareBus;
 import Message.Message;
@@ -10,7 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-public class TestProcessorDisplay1 {
+public class TestProcessorDisplay2 {
     private SoftwareBus softwareBus;
     private BorderPane pane;
 
@@ -21,17 +21,17 @@ public class TestProcessorDisplay1 {
     int currentSubtopic;
 
     /**
-     * Constructor for Processor 1, creates the user interface
+     * Constructor for Processor Display 2
      *
      * @param softwareBus Software bus for handling messages
-     * @param topic       Topic processor 1 is subscribed to
-     * @param subtopic    Subtopic processor 1 is subscribed to
+     * @param topic       Topic processor 2 is subscribed to
+     * @param subtopic    Subtopic processor 2 is subscribed to
      */
-    public TestProcessorDisplay1(SoftwareBus softwareBus, int topic, int subtopic) {
+    public TestProcessorDisplay2(SoftwareBus softwareBus, int topic, int subtopic) {
         this.softwareBus = softwareBus;
 
-        this.currentTopic = topic;
-        this.currentSubtopic = subtopic;
+        currentTopic = topic;
+        currentSubtopic = subtopic;
 
         pane = new BorderPane();
         buttonGrid = new GridPane();
@@ -43,7 +43,8 @@ public class TestProcessorDisplay1 {
         buttonPane.setMinSize(200, 200);
         buttonPane.getChildren().addAll(buttonGrid);
 
-        buttonPane.setBackground(new Background(new BackgroundFill(Color.GREY, CornerRadii.EMPTY, Insets.EMPTY)));
+        buttonPane.setBackground(new Background(new BackgroundFill(Color.ANTIQUEWHITE,
+                CornerRadii.EMPTY, Insets.EMPTY)));
         pane.setCenter(buttonPane);
 
         messageStatus = new Label("");
@@ -79,21 +80,21 @@ public class TestProcessorDisplay1 {
     }
 
     /**
-     * Method that handles when a button is clicked on
+     * Handles when an elevator button is clicked on
      *
      * @param count Button number
      */
     private void handleButtonClick(int count) {
         //When button is clicked, we should have a message be sent, simulates what happens in the elevator
         //String buttonNum = String.valueOf(count);
-        Message newMessage = new Message(2, 1, count);
+        Message newMessage = new Message(3, 1, count);
 
         softwareBus.publish(newMessage);
         updateSendMessage(newMessage);
     }
 
     /**
-     * Check for any incoming messages from the softwarebus
+     * Check for messages in the software bus
      */
     private void checkForIncomingMessage() {
         Thread thread = new Thread(() -> {
@@ -110,7 +111,7 @@ public class TestProcessorDisplay1 {
     }
 
     /**
-     * Update label to indicate that a message was received
+     * Update label indicating that a message was received
      *
      * @param message Message received
      */
@@ -119,16 +120,17 @@ public class TestProcessorDisplay1 {
     }
 
     /**
-     * Update label to indicate that a message was sent out
+     * Update label indicating that a message was sent
      *
-     * @param message Message sent out
+     * @param message Message sent
      */
     public void updateSendMessage(Message message) {
         messageStatus.setText("Message Sent!\n" + message.toString());
     }
 
+
     /**
-     * Border Pane
+     * Get Border Pane
      *
      * @return Pane
      */

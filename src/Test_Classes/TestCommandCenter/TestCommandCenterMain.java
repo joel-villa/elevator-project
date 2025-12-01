@@ -1,4 +1,4 @@
-package TestCommandCenter;
+package Test_Classes.TestCommandCenter;
 
 import Bus.SoftwareBus;
 import javafx.application.Application;

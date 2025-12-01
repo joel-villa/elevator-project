@@ -1,0 +1,6 @@
+# GUI
+This is used in conjunction with Tests to demonstrate the functionality
+of Elevator_Controller
+## Important note
+This will not be a part of the final product and is just to show that
+Elevator Controller is working under the hood.
