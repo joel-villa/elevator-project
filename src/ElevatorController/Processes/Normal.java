@@ -45,7 +45,13 @@ public class Normal {
 
             if (currentService == null) currentService = buttons.nextService(cabin.currentStatus());
             //go to floor of current service
-            if (currentService != null) cabin.gotoFloor(currentService.floor());
+            if (currentService != null) {
+                // update current service in the case of better destinations
+                currentService = buttons.nextService(cabin.currentStatus());
+
+                // go to the currentService floor
+                cabin.gotoFloor(currentService.floor());
+            }
             //arrive (open doors, wait, close doors)
             if (cabin.arrived() && currentService != null) {
                 //System.out.println("the humble 'whatchu doin queen'");

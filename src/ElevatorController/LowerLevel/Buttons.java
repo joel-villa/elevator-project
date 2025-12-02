@@ -29,7 +29,7 @@ public class Buttons {
     // Receiving from MUX
     private final static int TOPIC_HALL_CALL = SoftwareBusCodes.hallCall; // buttons in the halls
     private final static int TOPIC_CABIN_SELECT = SoftwareBusCodes.cabinSelect; // button events in the cabin
-    private final static int TOPIC_FIRE_KEY = SoftwareBusCodes.fireKey; //TODO: handle fire key messages
+    private final static int TOPIC_FIRE_KEY = SoftwareBusCodes.fireKey;
 
     //Sending to MUX
     private final static int TOPIC_RESET_CALL = SoftwareBusCodes.resetCall;
@@ -194,7 +194,7 @@ public class Buttons {
      * @param floor the floor request button that is no longer relevant
      */
     public void requestReset(int floor) {
-        // I am going to assume these ar the buttons inside the cabin
+        // CALL BUTTONS: are the hall buttons
         // we may want to consider keeping track of what buttons are on with an array of booleans
         // this could reduce clutter so we only call publish if the array contains true at the index of the floor
         softwareBus.publish(new Message(TOPIC_RESET_CALL, ELEVATOR_ID, floor));
@@ -346,9 +346,6 @@ public class Buttons {
 
         return destinations.get(0);
     }
-    //TODO: HANDLE handleHallCall();
-    //            handleFireKey();
-
     /**
      * Get the fire key message from the MUX
      */
