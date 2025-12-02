@@ -92,9 +92,11 @@ public class DoorAssembly {
     public boolean fullyClosed(){
         Message message =  MessageHelper.pullAllMessages(softwareBus, ELEVATOR_ID, TOPIC_DOOR_STATUS);
         if (message != null ) {
-            if (message.getBody() == OPEN_CODE) fullyClosed = false;
-            if (message.getBody() == CLOSE_CODE) fullyClosed = true;
-            else System.out.println("Unexpected body in SoftwareBusCodes.doorStatus Message in DoorAssembly: body = " + message.getBody());
+            switch (message.getBody()) {
+                case OPEN_CODE ->  this.fullyClosed = false;
+                case CLOSE_CODE -> this.fullyClosed = true;
+                default -> System.out.println("Unexpected body in SoftwareBusCodes.doorStatus Message in DoorAssembly: body = " + message.getBody());
+            }
         }
         return fullyClosed;
     }

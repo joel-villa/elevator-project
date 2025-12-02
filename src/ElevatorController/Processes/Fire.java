@@ -1,11 +1,10 @@
 package ElevatorController.Processes;
 
 import ElevatorController.LowerLevel.*;
-import ElevatorController.Util.ConstantsElevatorControl;
-import ElevatorController.Util.Direction;
 import ElevatorController.Util.FloorNDirection;
 import ElevatorController.Util.State;
 
+//TODO: wherever "Fully closed: true over capacity false obstructed false", is printing please remove it
 /**
  * In fire mode, the elevator only listens to request buttons in the cabin if the fire key has been inserted.
  * Only one service button can be lit up at a time.
@@ -19,94 +18,74 @@ public class Fire {
      * @param cabin the cabin lower level object
      * @param doorAssembly the door assembly lower level object
      * @param notifier the notifier lower level object
-     * @return
+     * @return the mode to switch to
      */
     public static State fire(Mode mode, Buttons buttons, Cabin cabin,
                              DoorAssembly doorAssembly, Notifier notifier){
-        System.out.println("IN FIRE"); // TODO: delete this (for debugging)
-
         //Buttons gets fire key message
 
         //buttons handles fire key
         //if single calls are enable then the fire key is inserted
         buttons.disableCalls();
 
-        buttons.enableSingleRequest();
+        buttons.disableRequests();
 
         //Close doors
         ProcessesUtil.doorClose(doorAssembly,notifier);
 
         FloorNDirection fireKeyService = null;
 
-        //TODO: this is just normal mode's code, not fully working
-        // TODO: button presses are not overriding
-        // - Expected behavior: pressing a button in the cabin while in fire mode should overwrite any presses
-        // - is this an issue in Buttons?
         while (mode.getMode() == State.FIRE){
-            if (fireKeyService == null) fireKeyService = buttons.nextService(cabin.currentStatus());
-            //go to floor of current service
-            if (fireKeyService != null) {
-                // update current service in the case of better destinations
-                // TODO: not over-writing destination for some reason
+            // While in fire mode do the following:
+            if (buttons.fireKeyInserted()){
+                // Fire key inserted -> can accept request button events in the cabin
+                buttons.enableSingleRequest();
+
+                // update fireService TODO: not over-writing destination for some reason
+                // TODO: I think next service potentially has bugs
                 fireKeyService = buttons.nextService(cabin.currentStatus());
 
-                // go to the fireKeyService floor
-                cabin.gotoFloor(fireKeyService.floor());
-            }
-            //arrive (open doors, wait, close doors)
-            if (cabin.arrived() && fireKeyService != null) {
-                //System.out.println("the humble 'whatchu doin queen'");
-                System.out.println("****** CABIN ARRIVED *****");
-                notifier.arrivedAtFloor(cabin.currentStatus());
-                ProcessesUtil.arriveProcess(buttons,doorAssembly,notifier,fireKeyService);
+                //go to floor of current service
+                if (fireKeyService != null) {
+                    // close doors
+                    ProcessesUtil.doorClose(doorAssembly, notifier);
+
+                    // go to the fireKeyService floor
+                    cabin.gotoFloor(fireKeyService.floor());
+                }
+
+                //arrive (open doors, wait, close doors)
+                //TODO this is normal mode logic for arriving, should be different for fire mode
+                if (cabin.arrived() && fireKeyService != null) {
+                    notifier.arrivedAtFloor(cabin.currentStatus());
+                    ProcessesUtil.arriveProcess(buttons,doorAssembly,notifier,fireKeyService);
+                    fireKeyService = null;
+                }
+            } else {
+                // Fire key not inserted -> go to floor one, wait with the doors open
                 fireKeyService = null;
+
+                // Request buttons disabled
+                buttons.disableRequests();
+
+                // Close doors
+                ProcessesUtil.doorClose(doorAssembly,notifier);
+
+                // Go to first floor
+                cabin.gotoFloor(1);
+
+                // If the cabin is at the first floor, wait with the doors open
+                // TODO change this to waiting with doors open
+                if(cabin.arrived() && doorAssembly.fullyClosed()){
+//                    notifier.arrivedAtFloor(cabin.currentStatus());
+//                    ProcessesUtil.arriveProcess(buttons,doorAssembly,notifier,fireKeyService);
+                    // Busy wait for the doors to open
+//                    while (!ProcessesUtil.tryDoorOpen(doorAssembly)) ;
+                }
             }
         }
 
-// NOTE: the code bellow is not working as intended
-//        while (mode.getMode() == State.FIRE){
-//            System.out.println("cabin.getTargetFloor(): " + cabin.getTargetFloor() + ", cabin.arrived(): " + cabin.arrived());
-//            //Listen to requests if fire key is inserted, otherwise go to first floor
-//            while (cabin.getTargetFloor() != 1 && !cabin.arrived()) {
-//                //Get any services enabled by fire key
-//                if (fireKeyService == null) fireKeyService = buttons.nextService(cabin.currentStatus());
-//                //Process services enabled by fire key
-//                if (fireKeyService != null) {
-//                    fireKeyService = buttons.nextService(cabin.currentStatus());
-//                    cabin.gotoFloor(fireKeyService.floor());
-//                }
-//                //Go to floor 1 if no requests
-//                else if (cabin.getTargetFloor() != 1)
-//                    cabin.gotoFloor(1);
-//                //Arrival process (open doors, wait, close doors)
-//                if (cabin.arrived()) {
-//                    ProcessesUtil.arriveProcess(buttons, doorAssembly, notifier, fireKeyService);
-//                    fireKeyService = null;
-//                }
-//                System.out.println("LOOPING"); //TODO: delete this (debugging)
-//            }
-//        }
-
-        // TODO: when you use the commented out code below, fire alarm plays noise, currently does not
-
-//        //Listen to requests if fire key is inserted, otherwise go to first floor
-//        while (cabin.getTargetFloor() != 1 && !cabin.arrived() && mode.getMode() == State.FIRE) {
-//            //Get any services enabled by fire key
-//            if (fireKeyService == null) fireKeyService = buttons.nextService(cabin.currentStatus());
-//            //Process services enabled by fire key
-//            if (fireKeyService != null)
-//                cabin.gotoFloor(fireKeyService.floor());
-//            //Go to floor 1 if no requests
-//            else if (cabin.getTargetFloor() != 1)
-//                cabin.gotoFloor(1);
-//            //Arrival process (open doors, wait, close doors)
-//            if (cabin.arrived()) {
-//                ProcessesUtil.arriveProcess(buttons, doorAssembly, notifier, fireKeyService);
-//                fireKeyService = null;
-//            }
-//        }
-
-//        Return exit mode
+//      Return exit mode
         return mode.getMode();
     }
 

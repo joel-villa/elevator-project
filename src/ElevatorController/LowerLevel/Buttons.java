@@ -17,13 +17,14 @@ import java.util.List;
  */
 public class Buttons {
     private boolean callEnabled;
-    private boolean multipleRequests;
+//    private boolean multipleRequests;
     private final int ELEVATOR_ID;
     private final List<FloorNDirection> destinations;
     private final SoftwareBus softwareBus;
     private int currFloor;
     private Direction currDirection;
     private boolean fireKey = false;
+    private RequestType requestType;
 
     //  *** Software Bus Topics ***
     // Receiving from MUX
@@ -64,7 +65,8 @@ public class Buttons {
 
         // Assuming normal mode settings initially
         this.callEnabled = true;
-        this.multipleRequests = true;
+//        this.multipleRequests = true;
+        this.requestType = RequestType.MULTI_SELECT;
 
         this.destinations = new ArrayList<>();
         this.softwareBus = softwareBus;
@@ -98,10 +100,6 @@ public class Buttons {
         //Floor Button Reset
 
         switch(floorNDirection.floor()){
-//            case UP -> softwareBus.publish(new Message(TOPIC_RESET_CALL, SUBTOPIC_BUILD_MUX, 0));
-//            case DOWN -> softwareBus.publish(new Message(TOPIC_RESET_CALL, SUBTOPIC_BUILD_MUX, 1));
-//            // if direction is not up or down handle with grace!
-//            default -> throw new IllegalStateException("Unexpected value: " + floorNDirection.direction());
             case 1 -> {
                 switch(floorNDirection.direction()) {
                     case UP -> softwareBus.publish(new Message(TOPIC_RESET_CALL, SUBTOPIC_BUILD_MUX, SoftwareBusCodes.reset1Up));
@@ -193,6 +191,7 @@ public class Buttons {
      * Remove that floor from destinations
      * @param floor the floor request button that is no longer relevant
      */
+    //TODO this is currently not being called, seems like an issue
     public void requestReset(int floor) {
         // CALL BUTTONS: are the hall buttons
         // we may want to consider keeping track of what buttons are on with an array of booleans
@@ -204,6 +203,11 @@ public class Buttons {
      * In normal mode, level call buttons are enabled
      */
     public void enableCalls(){
+        // ignore this call if calls are already enabled
+        if (callEnabled){
+            return;
+        }
+
         // Publish to MUX
         softwareBus.publish(new Message(TOPIC_CALLS_ENABLED,
                 SoftwareBusCodes.buildingMUX,
@@ -217,17 +221,28 @@ public class Buttons {
      * In fire mode, and controlled mode call buttons are disabled
      */
     public void disableCalls(){
+        // Do nothing if calls already enabled
+        if (!callEnabled){
+            return;
+        }
+
         // Notify MUX
         softwareBus.publish(new Message(TOPIC_CALLS_ENABLED, SoftwareBusCodes.buildingMUX,
                 SoftwareBusCodes.off));
 
         // Update local
-        this.callEnabled = false;}
+        this.callEnabled = false;
+    }
 
     /**
      * In Normal mode, all request buttons are enabled
      */
     public void enableAllRequests(){
+        //if request type is already all, do nothing
+        if (requestType == RequestType.MULTI_SELECT){
+            return;
+        }
+
         // Notify MUX
         softwareBus.publish(new Message(TOPIC_REQS_ENABLED, ELEVATOR_ID,
                 SoftwareBusCodes.on));
@@ -235,13 +250,19 @@ public class Buttons {
                 SoftwareBusCodes.multiple));
 
         // Set local variable
-        this.multipleRequests = true;
+//        this.multipleRequests = true;
+        requestType = RequestType.MULTI_SELECT;
     }
 
     /**
      * In Fire mode, the request buttons in the cabin are mutually exclusive
      */
     public void enableSingleRequest(){
+        // If request type is already mutually exclusive, do nothing
+        if(requestType == RequestType.MUTUALLY_EXCLUSIVE){
+            return;
+        }
+
         // Notify MUX
         softwareBus.publish(new Message(TOPIC_REQS_ENABLED, ELEVATOR_ID,
                 SoftwareBusCodes.on));
@@ -249,9 +270,39 @@ public class Buttons {
                 SoftwareBusCodes.single));
 
         // Set local variable
-        this.multipleRequests = false;
+//        this.multipleRequests = false;
+        requestType = RequestType.MUTUALLY_EXCLUSIVE;
     }
 
+    /**
+     * Disable request buttons in the cabin
+     * Note: should be called when...
+     *       - elevator gets turned off
+     *       - in fire mode, before the fire key is inserted (or when the fire
+     *         key is removed)
+     *       - in command center mode
+     */
+    public void disableRequests(){
+        // If request buttons are already disabled, do nothing
+        if (requestType == RequestType.DISABLED){
+            return;
+        }
+
+        // Send message to MUX
+        softwareBus.publish(new Message(TOPIC_REQS_ENABLED, ELEVATOR_ID, SoftwareBusCodes.off));
+
+        // Set local variable
+        requestType = RequestType.DISABLED;
+    }
+
+    /**
+     * Is the fire key inserted?
+     * @return True if it is, False otherwise
+     */
+    public boolean fireKeyInserted(){
+        handleFireKey();
+        return fireKey;
+    }
 
     /*
      * Note; call events have associated directions, and request events do not
@@ -270,7 +321,7 @@ public class Buttons {
         // Helper calls
         handleCabinSelect();
         handleHallCall();
-        handleFireKey();
+//        handleFireKey();
 
         currDirection = floorNDirection.direction();
         currFloor = floorNDirection.floor();
@@ -278,7 +329,15 @@ public class Buttons {
         // Calls disabled case
         if (!callEnabled && !fireKey) return null;
 
-        if (!multipleRequests) {
+        // Requests disabled case
+        if (requestType == RequestType.DISABLED) {
+            //TODO: is there ever a time when requests (in cabin) are disabled,
+            // but call buttons are enabled? I don't think so...
+            return null;
+        }
+
+        if (requestType == RequestType.MUTUALLY_EXCLUSIVE) {
+            // Get the next service if the request type is mutually exclusive
             if (!destinations.isEmpty()){
                 // Can only get first element of non-empty list
                 FloorNDirection nextService = destinations.getFirst();
@@ -295,7 +354,7 @@ public class Buttons {
         if(destinations.isEmpty()){
             return null;
         }
-        int currServiceFloor = destinations.get(0).getFloor();
+        int currServiceFloor = destinations.getFirst().getFloor();
 
         for (FloorNDirection fd : destinations) {
             //Service incompatible
@@ -344,7 +403,7 @@ public class Buttons {
         //re-add unreachable destinations
         destinations.addAll(unreachable);
 
-        return destinations.get(0);
+        return destinations.getFirst();
     }
     /**
      * Get the fire key message from the MUX
@@ -357,11 +416,11 @@ public class Buttons {
             switch (message.getBody()){
                 case BODY_F_KEY_ACTIVE -> {
                     fireKey = true;
-                    System.out.println("fire key active in Buttons of Elevator " + ELEVATOR_ID ); //TODO delete (for debuging)
+                    System.out.println("fire key active in Buttons of Elevator " + ELEVATOR_ID ); //TODO delete (for debugging)
                 }
                 case BODY_F_KEY_INACTIVE -> {
                     fireKey = false;
-                    System.out.println("fire key inactive in Buttons of Elevator " + ELEVATOR_ID ); //TODO delete (for debuging)
+                    System.out.println("fire key inactive in Buttons of Elevator " + ELEVATOR_ID ); //TODO delete (for debugging)
                 }
                 default -> {
                     fireKey = false;
@@ -421,6 +480,12 @@ public class Buttons {
         destinations.add(fd);
     }
 
-
-
+    /**
+     * Request buttons in the cabin can be in one of three logical states
+     */
+    private enum RequestType {
+        DISABLED,
+        MUTUALLY_EXCLUSIVE,
+        MULTI_SELECT
+    }
 }
