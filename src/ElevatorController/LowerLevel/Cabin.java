@@ -221,8 +221,4 @@ public class Cabin implements Runnable {
             }
         }
     }
-
-    //TODO: REMOVEEEEE
-    public int getID() {return ELEVATOR_ID;}
-
 }

@@ -50,7 +50,6 @@ public class DoorAssembly {
         this.softwareBus = softwareBus;
         this.ELEVATOR_ID = elevatorID;
 
-        //Todo: (DOOR_STATUS or DOOR_SENSOR????????)
         softwareBus.subscribe(TOPIC_DOOR_SENSOR, elevatorID);
         softwareBus.subscribe(TOPIC_CABIN_LOAD, elevatorID);
         softwareBus.subscribe(TOPIC_DOOR_STATUS, elevatorID);
@@ -79,7 +78,6 @@ public class DoorAssembly {
      * @return true if obstruction sensor triggered, false otherwise
      */
     public boolean obstructed(){
-        //Todo: ok so I assume this will return a message that says 0 for not obstructed and 1 if obstructed (DOOR_STATUS or DOOR_SENSOR????????)
         Message message = MessageHelper.pullAllMessages(softwareBus, ELEVATOR_ID, TOPIC_DOOR_SENSOR);
         if (message != null ) {
             if (message.getBody() == OBSTRUCTED_CODE) obstructed = true;
@@ -92,7 +90,6 @@ public class DoorAssembly {
      * @return true if fully closed sensor triggered, false otherwise
      */
     public boolean fullyClosed(){
-        // Todo: assuming 3 for fully closed and 4 for not fully closed (DOOR_STATUS or DOOR_SENSOR????????)
         Message message =  MessageHelper.pullAllMessages(softwareBus, ELEVATOR_ID, TOPIC_DOOR_STATUS);
         if (message != null ) {
             if (message.getBody() == OPEN_CODE) fullyClosed = false;
@@ -106,7 +103,6 @@ public class DoorAssembly {
      * @return true if fully open sensor triggered, false otherwise
      */
     public boolean fullyOpen(){
-        // Todo: assuming 5 for fully closed and 6 for not fully closed (DOOR_STATUS or DOOR_SENSOR????????)
         Message message =  MessageHelper.pullAllMessages(softwareBus, ELEVATOR_ID, TOPIC_DOOR_STATUS);
         if (message != null ) {
             if (message.getBody() == OPEN_CODE) fullyOpen = true;
@@ -120,7 +116,6 @@ public class DoorAssembly {
      *         capacity message was received, true initially
      */
     public boolean overCapacity(){
-        //Todo: assuming 0 for over capacity and 1 for not over capacity
         Message message = MessageHelper.pullAllMessages(softwareBus, ELEVATOR_ID, TOPIC_CABIN_LOAD);
         if (message != null ) {
             if (message.getBody() == OVER_CAPACITY_CODE) overCapacity = true;

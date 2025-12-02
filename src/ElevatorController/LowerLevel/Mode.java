@@ -47,7 +47,6 @@ public class Mode {
      * @param softwareBus the means of communication
      */
     public Mode(int elevatorID, SoftwareBus softwareBus) {
-        //TODO call subscribe on softwareBus w/ relevant topic/subtopic
         this.softwareBus = softwareBus;
         this.ELEVATOR_ID = elevatorID;
 
@@ -98,7 +97,7 @@ public class Mode {
         }
 
 
-        //TODO: do we have to send messages to the MUX?
+        //TODO: do we have to send the following message to the MUX?
         //Jackie: Also, don't worry about sending Fire Alarm to each elevator
         // when fire mode is activated by the pfd GUI specifically. The building
         // mux handles that automatically. They will need to be sent if you're doing
@@ -122,7 +121,6 @@ public class Mode {
 
         // Notify the MUX that the fire is active
         if (currentMode == State.FIRE){
-            //TODO are these bodies okay?
             softwareBus.publish(new Message(TOPIC_SET_FIRE, ELEVATOR_ID,
                     SoftwareBusCodes.emptyBody));
             softwareBus.publish(new Message(TOPIC_SET_FIRE, SoftwareBusCodes.buildingMUX, SoftwareBusCodes.emptyBody));

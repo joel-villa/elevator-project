@@ -30,7 +30,6 @@ public class Fire {
         //if single calls are enable then the fire key is inserted
         buttons.disableCalls();
 
-        //TODO: Should this be single or multiple?
         buttons.enableSingleRequest();
 
         //Close doors
