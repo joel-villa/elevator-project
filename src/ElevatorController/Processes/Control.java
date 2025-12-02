@@ -47,6 +47,8 @@ public class Control {
             }
             //Arrival process (open doors, wait, close doors)
             if (cabin.arrived()) {
+                System.out.println("****** CABIN ARRIVED *****");
+                notifier.arrivedAtFloor(cabin.currentStatus());
                 ProcessesUtil.arriveProcess(buttons, doorAssembly, notifier,
                         nextSer);
                 nextSer = null;

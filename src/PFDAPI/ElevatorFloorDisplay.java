@@ -32,6 +32,13 @@ public class ElevatorFloorDisplay {
     // The ID of the associated elevator
     private final int carId;
 
+    // Player for the arrival ding sound
+    private MediaPlayer arrivalPlayer;
+    // Player for the overload buzzer sound
+    private MediaPlayer overloadPlayer;
+    // Tracks whether the overload buzzer is currently playing
+    private boolean isOverloadPlaying = false;
+
     /**
      * Constructs the ElevatorFloorDisplay.
      * @param carId the ID of the associated elevator
@@ -62,15 +69,17 @@ public class ElevatorFloorDisplay {
         System.out.println("*Ding! Elevator " + carId + " has arrived.");
         Platform.runLater(() -> {
             try {
-                URL sound = getClass().getResource("/sounds/ding.mp3");
-                if (sound == null) {
-                    System.err.println("Sound file not found.");
-                    return;
+                if(arrivalPlayer == null) {
+                    URL sound = getClass().getResource("/sounds/ding.mp3");
+                    if (sound == null) {
+                        System.err.println("Sound file not found.");
+                        return;
+                    }
+                    arrivalPlayer = new MediaPlayer(new Media(sound.toExternalForm()));
                 }
 
-                Media media = new Media(sound.toExternalForm());
-                MediaPlayer player = new MediaPlayer(media);
-                player.play();
+                arrivalPlayer.stop(); // stop if it was already playing
+                arrivalPlayer.play(); // play once
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -82,21 +91,36 @@ public class ElevatorFloorDisplay {
      */
     public synchronized void playOverLoadWarning() {
         // simulating the buzzing noise
-        //System.out.println("*Buzz! Warning: Overload detected on Elevator " + carId);
+        System.out.println("*Buzz! Warning: Overload detected on Elevator " + carId);
         Platform.runLater(() -> {
             try {
-                URL sound = getClass().getResource("/sounds/buzz.mp3");
-                if (sound == null) {
-                    System.err.println("Sound file not found.");
-                    return;
+                if(!isOverloadPlaying) {
+                    if(overloadPlayer == null) {
+                        URL sound = getClass().getResource("/sounds/buzz.mp3");
+                        if (sound == null) {
+                            System.err.println("Sound file not found.");
+                            return;
+                        }
+                        overloadPlayer = new MediaPlayer(new Media(sound.toExternalForm()));
+                    }
+                    isOverloadPlaying = true;
+                    overloadPlayer.play(); //play once
                 }
-
-                Media media = new Media(sound.toExternalForm());
-                MediaPlayer player = new MediaPlayer(media);
-                player.play();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        });
+    }
+
+    /**
+     * Stops the overload buzzer and resets its state.
+     */
+    public synchronized void stopOverLoadWarning() {
+        Platform.runLater(() -> {
+            if (overloadPlayer != null) {
+                overloadPlayer.stop();
+            }
+            isOverloadPlaying = false;
         });
     }
 

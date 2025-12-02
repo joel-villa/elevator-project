@@ -222,6 +222,13 @@ public class ElevatorMultiplexor {
             else v = 0;
             Message loadMsg = new Message(SoftwareBusCodes.cabinLoad, ID, v);
             bus.publish(loadMsg);
+            if (isOverloaded) {
+                Message play = new Message(SoftwareBusCodes.playSound, ID, 1);
+                bus.publish(play);
+            } else {
+                Message stop = new Message(SoftwareBusCodes.playSound, ID, 2);
+                bus.publish(stop);
+            }
             lastOverloadState = isOverloaded;
         }
     }
@@ -368,13 +375,17 @@ public class ElevatorMultiplexor {
         elev.panel.setButtonsSingle(body);
     }
 
-    // Handle play arrival/overload Message
+    /// Handle play arrival/overload Message
     public void handlePlaySound(Message msg){
         int type = msg.getBody();
-        if (type == 0) {
+        if (type == 0) {               // ARRIVAL DING
             elev.display.playArrivalChime();
-        } else {
+
+        } else if (type == 1) {        // BUZZER ON
             elev.display.playOverLoadWarning();
+
+        } else if (type == 2) {        // BUZZER OFF
+            elev.display.stopOverLoadWarning();
         }
     }
 

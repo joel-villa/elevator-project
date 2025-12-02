@@ -56,6 +56,8 @@ public class Fire {
             //arrive (open doors, wait, close doors)
             if (cabin.arrived() && fireKeyService != null) {
                 //System.out.println("the humble 'whatchu doin queen'");
+                System.out.println("****** CABIN ARRIVED *****");
+                notifier.arrivedAtFloor(cabin.currentStatus());
                 ProcessesUtil.arriveProcess(buttons,doorAssembly,notifier,fireKeyService);
                 fireKeyService = null;
             }
