@@ -42,14 +42,11 @@ public class Normal {
         //Process Requests until state changes
         while (mode.getMode() == State.NORMAL) {
             //get next service
+             currentService = buttons.nextService(cabin.currentStatus());
+             //TODO: I think nextService may have scheduling bug (not overwriting to go to closer location)
 
-            if (currentService == null) currentService = buttons.nextService(cabin.currentStatus());
             //go to floor of current service
             if (currentService != null) {
-                // update current service in the case of better destinations
-                // TODO: not over-writing destination for some reason
-                currentService = buttons.nextService(cabin.currentStatus());
-
                 // go to the currentService floor
                 cabin.gotoFloor(currentService.floor());
             }
