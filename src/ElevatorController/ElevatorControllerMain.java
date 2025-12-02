@@ -2,15 +2,15 @@ package ElevatorController;
 
 import ElevatorController.Buttons.Buttons;
 import ElevatorController.Cabin.Cabin;
-import ElevatorController.Doors.Doors;
+import ElevatorController.DoorAssembly.DoorAssembly;
 import ElevatorController.Mode.Mode;
-import ElevatorController.Notifications.Notifications;
+import ElevatorController.Notifier.Notifier;
 
 public class ElevatorControllerMain {
     private Cabin cabin;
     private Buttons buttons;
-    private Doors doors;
-    private Notifications notifications;
+    private DoorAssembly doors;
+    private Notifier notifications;
     private Mode mode;
 
     public ElevatorControllerMain() {

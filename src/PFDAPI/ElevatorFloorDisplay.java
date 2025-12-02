@@ -1,10 +1,15 @@
 package PFDAPI;
 
+import PFDGUI.gui;
+
+//Team 10's import statements below
+//package pfdAPI;
+//
 import javafx.application.Platform;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import PFDGUI.gui;
-
+//import pfdGUI.gui;
+//
 import java.net.URL;
 
 /**
@@ -77,7 +82,7 @@ public class ElevatorFloorDisplay {
      */
     public synchronized void playOverLoadWarning() {
         // simulating the buzzing noise
-        System.out.println("*Buzz! Warning: Overload detected on Elevator " + carId);
+        //System.out.println("*Buzz! Warning: Overload detected on Elevator " + carId);
         Platform.runLater(() -> {
             try {
                 URL sound = getClass().getResource("/sounds/buzz.mp3");
@@ -104,3 +109,4 @@ public class ElevatorFloorDisplay {
         return guiControl.getIsCabinOverloaded(carId);
     }
 }
+

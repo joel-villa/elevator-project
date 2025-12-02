@@ -1,5 +1,6 @@
 package CommandCenter;
 
+import CommandCenter.ElevatorPanel;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -11,19 +12,41 @@ import javafx.geometry.Insets;
 
 import Bus.*;
 
-public class ElevatorControlSystem extends Application {
+public class ElevatorControlSystem{
 
-    private SoftwareBus busServer;
-    private SoftwareBus ccClient;
-    private ElevatorPanel[] elevators;
+    private ElevatorPanel2[] elevators;
+    private CommandCenter commandCenter;
     private CommandPanel commandPanel;
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("Command Center");
+    private SoftwareBus softwareBus;
 
-        busServer = new SoftwareBus(true);
-        ccClient = new SoftwareBus(false);
+
+    public ElevatorControlSystem(SoftwareBus softwareBus){
+        this.softwareBus=softwareBus;
+        commandCenter=new CommandCenter(softwareBus);
+
+        commandPanel=new CommandPanel(commandCenter);
+
+        elevators = new ElevatorPanel2[4];
+        for (int i = 0; i < 4; i++) {
+            elevators[i] = new ElevatorPanel2(i + 1, commandCenter); //Changed by team 6,7
+
+        }
+
+    }
+
+    /**
+     * This has been changed to just use java fx, any logic surrounding the
+     * software bust or starting logic has been moved to the constructor
+     * the application scene can be set.
+     * Applications may create other stages, if needed, but they will not be
+     * primary stages.
+     */
+
+
+    public Stage getStage() {
+        Stage primaryStage=new Stage();
+        primaryStage.setTitle("Command Center");
 
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #333333;");
@@ -37,20 +60,19 @@ public class ElevatorControlSystem extends Application {
         elevatorContainer.setAlignment(Pos.TOP_CENTER);
         elevatorContainer.setPadding(new Insets(10));
 
-        elevators = new ElevatorPanel[4];
         for (int i = 0; i < 4; i++) {
-            elevators[i] = new ElevatorPanel(i + 1);
             elevatorContainer.getChildren().add(elevators[i]);
         }
         root.setCenter(elevatorContainer);
 
-        commandPanel = new CommandPanel(ccClient);
+
         root.setRight(commandPanel);
 
-        Scene scene = new Scene(root, 1200, 720);
+        Scene scene = new Scene(root, 800, 660);
         primaryStage.setScene(scene);
-        primaryStage.show();
+        return primaryStage;
+
     }
 
-    public static void main(String[] args) { launch(args); }
+
 }

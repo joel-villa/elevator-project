@@ -1,12 +1,14 @@
-package Motion;
+package Motion.Elevator_Controler;
 
-import java.util.HashMap;
 import Motion.Hardware.Motor;
 import Motion.Hardware.Sensor;
 import Motion.Simulation.MotionSimulation;
 import Motion.Util.Direction;
 
-public class MotionAPI {
+
+import java.util.HashMap;
+
+public class MotionController {
     //The direction the elevator is moving in
     public Direction direction=null;
     //Sensors mapped to floor numbers
@@ -16,14 +18,14 @@ public class MotionAPI {
     //The hardware representative
     private Motor motor;
     //Informs the hardware
-    private MotionSimulation motionSimulation;
+    public MotionSimulation motionSimulation;
 
     /**
      * Creates a new motionController object, creates motor, sensor map, and
      * motion simulation
      *
      */
-    public MotionAPI(){
+    public MotionController(){
         motor=new Motor();
         sensor_HashMap=new HashMap<>();
         for (int i = 0; i <= MAX_SENSOR_IDX; i++) {
@@ -83,6 +85,7 @@ public class MotionAPI {
      * movement from constant_speed to zero with a decay of deeleration
      */
     public void stop(){
+        System.out.println("Stopping");
         motor.stop();
     }
 

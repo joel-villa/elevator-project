@@ -1,5 +1,7 @@
 package Motion.GUI;
 
+import Motion.Hardware.*;
+import Motion.Util.*;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
@@ -7,9 +9,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import Motion.MotionAPI;
-import Motion.Hardware.*;
-import Motion.Util.*;
 
 import java.util.HashMap;
 
@@ -27,7 +26,7 @@ public class ElevatorGUI {
      * Acceleration of the motor (same for start and stop): 0.3333333333333333 meters per second^2
      */
 
-    private MotionAPI motion_API = new MotionAPI();
+
     //private Label direction_label = new Label("direction:null");
    // private Label top_alignment_label = new Label("top_Aligned:null");
    // private Label bottom_alignment_label = new Label("bottom_Aligned:null");
@@ -61,6 +60,7 @@ public class ElevatorGUI {
         this.sensor_HashMap = sensor_HashMap;
         this.motor = motor;
         this.elevator = elevator;
+        //this.elevator = new Elevator();
         this.sensorsFX = new HashMap<>();
         this.sensor_pos_HashMap = sensor_pos_HashMap;
     }
@@ -71,8 +71,8 @@ public class ElevatorGUI {
 
     //I added the stage as a parameter because it was always null.
     // We can change this I just wanted to make it run, so I could fix the GUI
-    public Stage getPrimaryStage(Stage stage) {
-        this.primaryStage = stage;
+    public Stage getPrimaryStage() {
+        Stage primaryStage = new Stage();
         primaryStage.setTitle("Group 7's super sick gui");
         shaftPane = new Pane();
         shaftPane.setPrefSize(joel_to_java(SHAFT_WIDTH), joel_to_java(SHAFT_HEIGHT) + joel_to_java(2 * SENSOR_HEIGHT));
@@ -137,7 +137,7 @@ public class ElevatorGUI {
 
         Scene scene = new Scene(root, 300, 635);
         primaryStage.setScene(scene);
-        primaryStage.show();
+        //primaryStage.show();
 
         return primaryStage;
     }

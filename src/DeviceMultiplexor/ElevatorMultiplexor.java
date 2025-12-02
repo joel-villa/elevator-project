@@ -2,8 +2,8 @@ package DeviceMultiplexor;
 
 import Bus.*;
 import Message.*;
-import Motion.MotionAPI;
-import Motion.Util.Direction;
+import Motion.Elevator_Controler.*;
+import Motion.Util.*;
 import PFDAPI.*;
 
 /**
@@ -14,9 +14,10 @@ import PFDAPI.*;
  * Note: car and elevator are used interchangeably in this context.
  */
 public class ElevatorMultiplexor {
-
+    private final SoftwareBus bus;
     // Constructor
-    public ElevatorMultiplexor(int ID){
+    public ElevatorMultiplexor(int ID, SoftwareBus softwareBus){
+        bus = softwareBus;
         this.ID = ID;
         this.elev = new Elevator(ID, 10);
         initialize();
@@ -27,8 +28,7 @@ public class ElevatorMultiplexor {
     private String currentDirection = "IDLE";
     private final int ID;
     private final Elevator elev;
-    private final SoftwareBus bus = new SoftwareBus(false);
-    private final MotionAPI motionAPI = new MotionAPI();
+    private final MotionController motionAPI = new MotionController();
     private boolean lastFireKeyState = false;
     private boolean lastObstructedState = false;
     private boolean lastOverloadState = false;
@@ -49,7 +49,7 @@ public class ElevatorMultiplexor {
         bus.subscribe(SoftwareBusCodes.selectionsEnable, ID);
         bus.subscribe(SoftwareBusCodes.selectionsType, ID);
         bus.subscribe(SoftwareBusCodes.playSound, ID);
-        bus.subscribe(SoftwareBusCodes.fireAlarm, 0);
+        bus.subscribe(SoftwareBusCodes.fireAlarm, ID);
 
         System.out.println("ElevatorMUX " + ID + " initialized and subscribed");
         startBusPoller();
@@ -64,10 +64,13 @@ public class ElevatorMultiplexor {
     // Polls the software bus for messages and handles them accordingly
     public void startBusPoller() {
         Thread t = new Thread(() -> {
+
             // keep polling
             while (true) {
                 Message msg;
                 msg = bus.get(SoftwareBusCodes.doorControl, ID);
+
+
                 if (msg != null) {
                     handleDoorControl(msg);
                 }
@@ -81,6 +84,7 @@ public class ElevatorMultiplexor {
                 }
                 msg = bus.get(SoftwareBusCodes.carDispatch, ID);
                 if (msg != null) {
+
                     handleCarDispatch(msg);
                 }
                 msg = bus.get(SoftwareBusCodes.resetFloorSelection, ID);
@@ -100,11 +104,11 @@ public class ElevatorMultiplexor {
                 if (msg != null) {
                     handleSelectionType(msg);
                 }
-                msg = bus.get(SoftwareBusCodes.playSound, 0);
+                msg = bus.get(SoftwareBusCodes.playSound, ID);
                 if (msg != null) {
                     handlePlaySound(msg);
                 }
-                msg = bus.get(SoftwareBusCodes.fireAlarm, 0);
+                msg = bus.get(SoftwareBusCodes.fireAlarm, ID);
                 if (msg != null) {
                     handleFireAlarm(msg);
                 }
@@ -160,6 +164,7 @@ public class ElevatorMultiplexor {
     // Poll and publish pressed floor buttons
     private void pollPressedFloors() {
         int targetFloor = elev.panel.getPressedFloor();
+        //System.out.println("Target Elevator in mux is "+ targetFloor);
         if (targetFloor != 0 && targetFloor != lastPressedFloor) {
             Message selectMsg = new Message(SoftwareBusCodes.cabinSelect, ID, targetFloor);
             bus.publish(selectMsg);

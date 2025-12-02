@@ -13,22 +13,15 @@ import java.util.Arrays;
 
 import static java.lang.Math.abs;
 
-/**
- * Class that defines the BuildingMultiplexor, which coordinates communication from the Elevator
- * Command Center to the relevant devices. Communication is accomplished via the software bus,
- * and both the PFDs and the motion devices are subject to control.
- *
- * Note: car and elevator are used interchangeably in this context.
- */
 public class BuildingMultiplexor {
-
+    private final SoftwareBus bus;
     // Constructor
-    public BuildingMultiplexor(){
+    public BuildingMultiplexor(SoftwareBus softwareBus){
+        bus = softwareBus;
         initialize();
     }
 
     // Listener for GUI/API integration
-    private final SoftwareBus bus = new SoftwareBus(false);
     private final Building bldg = new Building(10);;
     boolean[][] lastCallState = new boolean[bldg.totalFloors][3]; // Up/Down/Null
     private boolean lastFireState = false;
@@ -42,10 +35,11 @@ public class BuildingMultiplexor {
 
     // Initialize the MUX
     public void initialize() {
-        bus.subscribe(SoftwareBusCodes.fireAlarm, 0);
-        bus.subscribe(SoftwareBusCodes.resetCall, 0);
-        bus.subscribe(SoftwareBusCodes.callsEnable, 0);
+        bus.subscribe(SoftwareBusCodes.fireAlarm, 5);
+        bus.subscribe(SoftwareBusCodes.resetCall, 5);
+        bus.subscribe(SoftwareBusCodes.callsEnable, 5);
 
+        //NOTE: MUX EATS THESE MESSAGES FOR OPTIMAL CALL DISPATCHING
         bus.subscribe(SoftwareBusCodes.cabinPosition, 1);
         bus.subscribe(SoftwareBusCodes.cabinPosition, 2);
         bus.subscribe(SoftwareBusCodes.cabinPosition, 3);
@@ -68,16 +62,16 @@ public class BuildingMultiplexor {
             while (true) {
 
                 Message msg;
-                msg = bus.get(SoftwareBusCodes.fireAlarm, 0);
+                msg = bus.get(SoftwareBusCodes.fireAlarm, 5);
                 if (msg != null) {
                     handleFireAlarm(msg);
                 }
-                msg = bus.get(SoftwareBusCodes.resetCall, 0);
+                msg = bus.get(SoftwareBusCodes.resetCall, 5);
                 if (msg != null) {
                     handleCallReset(msg);
                 }
 
-                msg = bus.get(SoftwareBusCodes.callsEnable, 0);
+                msg = bus.get(SoftwareBusCodes.callsEnable, 5);
                 if (msg != null) {
                     handleCallEnable(msg);
                 }
@@ -150,7 +144,7 @@ public class BuildingMultiplexor {
     private void pollFireAlarm() {
         boolean state = bldg.callButtons[0].getFireAlarmStatus();
         if (state != lastFireState) {
-            bus.publish(new Message(SoftwareBusCodes.fireAlarmActive, 0, state ? FIRE_ON : FIRE_OFF));
+            bus.publish(new Message(SoftwareBusCodes.fireAlarmActive, 5, state ? FIRE_ON : FIRE_OFF));
             lastFireState = state;
             if(state){
                 fireAlarmResets(true);
@@ -179,8 +173,8 @@ public class BuildingMultiplexor {
 
     // Handle Call Reset Message
     public void handleCallReset(Message msg) {
-        int floor = msg.getSubTopic()-1;
-        int directionCode = msg.getBody();
+        int floor = msg.getBody()/10;
+        int directionCode = msg.getBody()%10;
         if (directionCode == DIR_UP) {
             bldg.callButtons[floor].resetCallButton("UP");
             lastCallState[floor][0] = false;
@@ -198,7 +192,7 @@ public class BuildingMultiplexor {
         bldg.callButtons[1].setButtonsEnabled(body);
     }
 
-    // Poll all elevator position (for call button servicing)
+    // Handle all elevator position (for call button servicing)
     private void handleElevatorPos(Message msg){
         int elevator = msg.getSubTopic()-1;
         int floor =  msg.getBody();
@@ -228,7 +222,10 @@ public class BuildingMultiplexor {
             buttons.resetCallButton("UP");
         }
         if(sendMsg){
-            bus.publish(new Message(SoftwareBusCodes.fireAlarm, 0, 1));
+            bus.publish(new Message(SoftwareBusCodes.fireAlarm, 1, 1));
+            bus.publish(new Message(SoftwareBusCodes.fireAlarm, 2, 1));
+            bus.publish(new Message(SoftwareBusCodes.fireAlarm, 3, 1));
+            bus.publish(new Message(SoftwareBusCodes.fireAlarm, 4, 1));
         }
     }
 

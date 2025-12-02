@@ -2,6 +2,11 @@ package PFDAPI;
 
 import PFDGUI.gui;
 
+// Below are Team10's import statements
+//package pfdAPI;
+//
+//import pfdGUI.gui;
+
 /**
  * Class that defines the functionality of the Elevator doors. Represents
  * the pair of doors that open to a specific elevator on each floor.
@@ -59,7 +64,7 @@ public class ElevatorDoorsAssembly {
      * Commands the door assembly to close.
      * If obstruction occurs during closing, doors reopen automatically.
      */
-        public synchronized void close() {
+    public synchronized void close() {
         isObstructed();
         if (isOpen) {
             isMoving = true;
@@ -130,3 +135,4 @@ public class ElevatorDoorsAssembly {
 
 
 }
+

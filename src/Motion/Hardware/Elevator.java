@@ -1,11 +1,11 @@
 package Motion.Hardware;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import Motion.Util.Constants;
 import Motion.Util.Observable;
 import Motion.Util.Observer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Authors: Natalie Runyan, Valerie Barker

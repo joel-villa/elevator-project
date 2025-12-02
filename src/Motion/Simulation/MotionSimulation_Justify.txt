@@ -7,4 +7,4 @@ Motion simulation does not talk to the api directly, but instead
 talks to the *actual hardware.
 
 *The 'actual hardware' is a mockup of the hardware, which decisions are being informed
-by Motion simulator, see Hardware, and Simulation.MotionSimulation.
+by motion simulator, see Hardware, and Simulation.MotionSimulation.

@@ -2,9 +2,7 @@ package PFDGUI;
 
 import java.util.ArrayList;
 
-import DeviceMultiplexor.BuildingMultiplexor;
 import DeviceMultiplexor.ElevatorMultiplexor;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.stage.Screen;
@@ -27,7 +25,7 @@ import Utils.imageLoader;
  * Simple JavaFX GUI that listens to model classes via a nested listener
  * interface and swaps images in response to events.
  */
-public class gui extends Application {
+public class gui {
     private int numElevators = 4; // Total number of elevators
     private int numFloors = 10; // Total number of floors
     private imageLoader loader; // Utility image loader
@@ -54,13 +52,13 @@ public class gui extends Application {
      * GUI Control & State Query Interface
      */
 
-     public class GUIControl {
+    public class GUIControl {
         public GUIControl() {
             for (int i = 0; i < numElevators; i++) {
                 pressedFloors[i] = new ArrayList<>();
             }
         }
-        
+
         // Internal State Variables
         private ArrayList<Integer>[] pressedFloors = new ArrayList[numElevators];
         private boolean[] doorObstructions = new boolean[numElevators];
@@ -73,17 +71,17 @@ public class gui extends Application {
         private int lastSelected = 0;
 
         // Getters for internal state variables
-        public ArrayList<Integer> getPressedFloors(int ID) { 
-            int panelIndex = ID - 1; 
-            return (panelIndex >= 0 && panelIndex < numElevators) ? pressedFloors[panelIndex] : new ArrayList<>(); 
+        public ArrayList<Integer> getPressedFloors(int ID) {
+            int panelIndex = ID - 1;
+            return (panelIndex >= 0 && panelIndex < numElevators) ? pressedFloors[panelIndex] : new ArrayList<>();
         }
-        public boolean getIsDoorObstructed(int ID) { 
-            int panelIndex = ID - 1; 
-            return (panelIndex >= 0 && panelIndex < numElevators) ? doorObstructions[panelIndex] : false; 
+        public boolean getIsDoorObstructed(int ID) {
+            int panelIndex = ID - 1;
+            return (panelIndex >= 0 && panelIndex < numElevators) ? doorObstructions[panelIndex] : false;
         }
-        public boolean getIsCabinOverloaded(int ID) { 
-            int panelIndex = ID - 1; 
-            return (panelIndex >= 0 && panelIndex < numElevators) ? cabinOverloads[panelIndex] : false; 
+        public boolean getIsCabinOverloaded(int ID) {
+            int panelIndex = ID - 1;
+            return (panelIndex >= 0 && panelIndex < numElevators) ? cabinOverloads[panelIndex] : false;
         }
         public boolean getFireAlarm() { return fireAlarmActive; }
 
@@ -155,10 +153,10 @@ public class gui extends Application {
             Platform.runLater(() -> {
                 doorObstructions[ID-1] = isObstructed;
                 ImageView doorImg = doors[ID-1].elevDoorsImg;
-                
+
                 // Update image based on current door state + new obstruction state
-                if (loader.imageList.get(6).equals(doorImg.getImage()) || 
-                    loader.imageList.get(7).equals(doorImg.getImage())) {
+                if (loader.imageList.get(6).equals(doorImg.getImage()) ||
+                        loader.imageList.get(7).equals(doorImg.getImage())) {
                     // Door is open - update open state
                     doorImg.setImage(isObstructed ? loader.imageList.get(7) : loader.imageList.get(6));
                 }
@@ -173,29 +171,29 @@ public class gui extends Application {
                 if (open) {
                     // Opening doors, show midway transition then fully open
                     if (doorObstructions[ID-1]) {
-                        doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(5)); 
+                        doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(5));
                     } else {
-                        doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(4)); 
+                        doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(4));
                     }
-                    
+
                     new Thread(() -> {
                         try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
                         Platform.runLater(() -> {
                             if (doorObstructions[ID-1]) {
-                                doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(7)); 
+                                doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(7));
                             } else {
-                                doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(6)); 
+                                doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(6));
                             }
                         });
                     }).start();
                 } else {
                     // Closing doors, show midway transition
                     if (doorObstructions[ID-1]) {
-                        doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(5)); 
+                        doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(5));
                     } else {
-                        doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(4)); 
+                        doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(4));
                     }
-                    
+
                     new Thread(() -> {
                         try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
                         Platform.runLater(() -> {
@@ -203,13 +201,13 @@ public class gui extends Application {
                                 // reopen doors, Obstruction detected
                                 System.out.println("Obstruction detected - reopening doors for elevator " + ID);
                                 if (doorObstructions[ID-1]) {
-                                    doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(7)); 
+                                    doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(7));
                                 } else {
-                                    doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(6)); 
+                                    doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(6));
                                 }
                             } else {
                                 // No obstruction, close fully
-                                doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(3)); 
+                                doors[ID-1].elevDoorsImg.setImage(loader.imageList.get(3));
                             }
                         });
                     }).start();
@@ -255,10 +253,9 @@ public class gui extends Application {
                 Platform.runLater(() -> {
                     if (direction.contains("UP")) {
                         callButtons[buttonIndex].elevCallButtonsImg.setImage(loader.imageList.get(15));
-                        System.out.println("UP button set on floor " + floorNumber);
                     } else if (direction.contains("DOWN")) {
                         callButtons[buttonIndex].elevCallButtonsImg.setImage(loader.imageList.get(14));
-                        System.out.println("DOWN button set on floor " + floorNumber);
+
                     }
                 });
             }
@@ -269,6 +266,9 @@ public class gui extends Application {
             int buttonIndex = floorNumber - 1;  // Convert floor number (1-10) to array index (0-9)
             if (buttonIndex >= 0 && buttonIndex < numFloors) {
                 Platform.runLater(() -> {
+                    if(callButtons[buttonIndex]==null){
+                        return;
+                    }
                     if(callButtons[buttonIndex].direction.equals("BOTH")) {
                         if(direction.equalsIgnoreCase("UP")) {
                             callButtons[buttonIndex].setDirection("DOWN");
@@ -303,6 +303,9 @@ public class gui extends Application {
             if (buttonIndex < 0 || buttonIndex >= numFloors) {
                 return false;
             }
+            if(callButtons[buttonIndex]==null){
+                return false; //zzz ????????????
+            }
             String currentDirection = callButtons[buttonIndex].direction;
             if(currentDirection.equalsIgnoreCase("BOTH")) {
                 return true;
@@ -318,9 +321,8 @@ public class gui extends Application {
 
     private double scale = 0.8;
 
-    @Override
-    public void start(Stage primaryStage) {
-
+    public Stage getStage() {
+        Stage primaryStage = new Stage();
         // load images via utility
         loader = new imageLoader();
         loader.loadImages();
@@ -353,27 +355,28 @@ public class gui extends Application {
             displays[i] = new Display(i);
             weighScales[i] = new WeighScale(i);
 
-            v.getChildren().addAll(panels[i].panelOverlay, displays[i].displayOverlay, 
-            doors[i].doorOverlay, weighScales[i].weightTriggerButton);
+            v.getChildren().addAll(panels[i].panelOverlay, displays[i].displayOverlay,
+                    doors[i].doorOverlay, weighScales[i].weightTriggerButton);
 
             hbox.getChildren().add(v);
             v.setAlignment(Pos.CENTER);
         }
-        
+
         double width = Screen.getPrimary().getBounds().getWidth() * (scale - 0.1);
         double height = Screen.getPrimary().getBounds().getHeight() * (scale - 0.2);
-        
+
         Scene scene = new Scene(hbox, width, height, Color.web("#c0bfbbff"));
         primaryStage.setTitle("Elevator Passenger Devices");
         primaryStage.setScene(scene);
-        primaryStage.show();
-        
-        // Initialize multiplexors AFTER GUI is fully set up
-        new BuildingMultiplexor();
-        for (int i = 0; i < numElevators; i++) {
-            elevatorMuxes[i] = new ElevatorMultiplexor(i + 1);  // Store the reference
-        }
-        System.out.println("All multiplexors initialized after GUI setup");
+        return primaryStage;
+//        primaryStage.show();
+
+
+    }
+
+    public void initilizeMuxs(ElevatorMultiplexor[] elevatorMuxes){
+        this.elevatorMuxes=elevatorMuxes;
+
     }
 
     private class Panel{
@@ -385,9 +388,9 @@ public class gui extends Application {
         private int offset = 20;
         private int carId;
 
-        private Panel(int index){ 
+        private Panel(int index){
             this.carId = index;
-            makePanel(); 
+            makePanel();
         }
 
         private void makePanel(){
@@ -476,30 +479,30 @@ public class gui extends Application {
         public StackPane doorOverlay = new StackPane(elevDoorsImg);
         private int carId;
 
-        private Door(int index){ 
+        private Door(int index){
             this.carId = index;
-            makeDoor(); 
+            makeDoor();
         }
 
         private void makeDoor(){
             elevDoorsImg.setPreserveRatio(true);
             elevDoorsImg.setFitWidth(300);
-            elevDoorsImg.setImage(loader.imageList.get(6)); 
-            
+            elevDoorsImg.setImage(loader.imageList.get(6));
+
             internalState.doorObstructions[carId] = false;
 
             elevDoorsImg.setOnMouseClicked(event -> {
                 if(loader.imageList.get(6).equals(elevDoorsImg.getImage())) {
                     Platform.runLater(() -> {
                         internalState.doorObstructions[carId] = true;
-                        elevDoorsImg.setImage(loader.imageList.get(7)); 
+                        elevDoorsImg.setImage(loader.imageList.get(7));
                     });
                     return;
-                } 
+                }
                 else if(loader.imageList.get(7).equals(elevDoorsImg.getImage())) {
                     Platform.runLater(() -> {
                         internalState.doorObstructions[carId] = false;
-                        elevDoorsImg.setImage(loader.imageList.get(6)); 
+                        elevDoorsImg.setImage(loader.imageList.get(6));
                     });
                     return;
                 }
@@ -513,9 +516,9 @@ public class gui extends Application {
         public Label digitalLabel;
         private int displayIndex;
 
-        private Display(int index){ 
+        private Display(int index){
             this.displayIndex = index;
-            makeDisplay(); 
+            makeDisplay();
         }
 
         private void makeDisplay(){
@@ -543,8 +546,8 @@ public class gui extends Application {
         public Button weightTriggerButton = new Button("Overload");
         private int buttonIndex;
 
-        public WeighScale(int index){ 
-            this.buttonIndex = index; 
+        public WeighScale(int index){
+            this.buttonIndex = index;
             makeTrigger();
         }
 
@@ -555,7 +558,7 @@ public class gui extends Application {
             weightTriggerButton.setFont(Font.font("Times New Roman", FontWeight.BOLD, 22));
 
             weightTriggerButton.setOnMouseClicked(event -> {
-                
+
                 // Notify the multiplexor of the overload weight click
                 Platform.runLater(() -> {
                     String style = weightTriggerButton.getStyle();
@@ -564,7 +567,7 @@ public class gui extends Application {
                     if (isOverloaded) {
                         // Toggle to NORMAL
                         weightTriggerButton.setStyle("-fx-background-color: #bdbdbdff; -fx-text-fill: black;");
-                        internalState.cabinOverloads[buttonIndex] = false;                     
+                        internalState.cabinOverloads[buttonIndex] = false;
                     } else {
                         // Toggle to OVERLOAD
                         weightTriggerButton.setStyle("-fx-background-color: #684b4bff; -fx-text-fill: black;");
@@ -581,10 +584,10 @@ public class gui extends Application {
         private int buttonIndex;
         private String direction;
 
-        private CallButton(int index){ 
+        private CallButton(int index){
             this.buttonIndex = index;
             this.direction = "IDLE";
-            makeCallButton(); 
+            makeCallButton();
         }
 
         private void makeCallButton(){
@@ -678,13 +681,13 @@ public class gui extends Application {
     }
 
     /**************************************************
-    * Main Application Entry Point
-    ****************************************
-    */
+     * Main Application Entry Point
+     ****************************************
+     */
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+//    public static void main(String[] args) {
+//        launch(args);
+//    }
 
 
 }

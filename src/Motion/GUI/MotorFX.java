@@ -1,9 +1,9 @@
 package Motion.GUI;
 
-import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
 import Motion.Hardware.*;
 import Motion.Util.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.*;
 
 /**
  * Author: Youssef Amin, Danny Phantom, VallyPally
@@ -21,7 +21,7 @@ public class MotorFX implements Observer {
     public void update(Observable viewee) {
         if (viewee instanceof Motor) {
             Direction dir = (((Motor) viewee).get_direction());
-            //change colors to be pretty
+            //Todo: change colors to be pretty
             if (dir == Direction.UP) {
                 motor.setFill(Color.AQUA);
             } else if (dir == Direction.DOWN) {

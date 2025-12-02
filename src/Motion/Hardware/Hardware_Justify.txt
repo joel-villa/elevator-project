@@ -9,7 +9,7 @@ Can return where it is (upper and lower y positions) and update its y position.
 ## Motor
 Can set its direction, turn on and off and update those watching it.
 See Util.Observable
-It is observed by Motion simulation, so Motion simulation can inform the other hardware,
+It is observed by motion simulation, so motion simulation can inform the other hardware,
 such as moving the elevator up/down when the elevator is on.
 
 ## Sensor

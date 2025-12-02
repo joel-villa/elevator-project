@@ -1,8 +1,8 @@
 package Motion.Hardware;
+import Motion.Util.*;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import Motion.Util.*;
 
 /**
  * Authors: Natalie Runyan, Valerie Barker, Youssef Amin

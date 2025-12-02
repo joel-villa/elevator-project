@@ -1,46 +1,11 @@
 package ElevatorController.Mode;
 
-import Bus.SoftwareBus;
-import Bus.SoftwareBusCodes;
-import ElevatorController.Misc.Destination;
-import ElevatorController.Misc.ModeEnum;
-import Message.Message;
-
+/**
+ * The mode serves as a means for the Elevator Controller to be put into and track its current mode.
+ * The mode is indirectly being updated by the Control Room, a separate entity outside of the Elevator Controller system.
+ * Additionally, the mode is responsible for taking in demands from the Control Room when the elevator is being remotely controlled.
+ * The mode object receives messages via the software bus but does not post messages to the software bus.
+ */
 public class Mode {
-    private SoftwareBus softwareBus;
-    private ModeEnum currMode;
-    private Destination currDest;
-    private int currentElevator;
 
-
-    public Mode(int currentElevator, SoftwareBus softwareBus) {
-        this.softwareBus = softwareBus;
-        this.currentElevator = currentElevator;
-        this.currMode = ModeEnum.NORMAL;
-        this.currDest = null;
-
-        softwareBus.subscribe(SoftwareBusCodes.elevatorState, currentElevator);
-        softwareBus.subscribe(SoftwareBusCodes.setMode, currentElevator);
-        softwareBus.subscribe(SoftwareBusCodes.setDestination, currentElevator);
-        softwareBus.subscribe(SoftwareBusCodes.fireAlarm, currentElevator);
-
-    }
-
-    public ModeEnum getMode(){
-        // check software bus for new mode
-        return currMode;
-    }
-
-    public Destination getDestination(){
-        int nextFloor = -1;
-        Message msg = softwareBus.get(SoftwareBusCodes.setDestination, currentElevator);
-
-        while(msg != null){
-            nextFloor = msg.getBody();
-            msg = softwareBus.get(SoftwareBusCodes.setDestination, currentElevator);
-        }
-
-        Destination nextDest = new Destination(nextFloor, -1);
-        return nextDest;
-    }
 }

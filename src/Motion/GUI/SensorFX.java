@@ -1,9 +1,9 @@
 package Motion.GUI;
 
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import Motion.Hardware.*;
 import Motion.Util.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 public class SensorFX implements Observer {
     private Circle sen;

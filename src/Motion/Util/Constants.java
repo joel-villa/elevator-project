@@ -8,7 +8,7 @@ public class Constants {
     // Distance between sensors on the same level (in meters)
     public static final double HEIGHT = 3;
 //    public static final double HEIGHT = 2.875;
-    // check if all constants are correct
+    // TODO: check if all constants are correct
 
 
     // Distance between sensors on distinct levels (in meters)

@@ -1,8 +1,20 @@
 package PFDAPI;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import java.net.URL;
+
+import javafx.application.Platform;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import PFDGUI.gui;
+
+//NOTE, below are Mux's original import statements
+//package pfdAPI;
+//
+//import java.util.ArrayList;
+//import java.util.List;
+//import pfdGUI.gui;
 
 /**
  * Device inside of elevators that allows for user-interaction. Allows cabin riders to
@@ -58,7 +70,9 @@ public class CabinPassengerPanel implements CabinPassengerPanelAPI {
      * @param floorNumber The floor being requested
      */
     public synchronized void pressFloorButton(int floorNumber) {
+        //System.out.println("IM HERE IM HERE");
         if (floorNumber >= 1 && floorNumber <= totalFloors && !floorButtons[floorNumber - 1]) {
+            //System.out.println("adding "+floorNumber+ " to pressed floors");
             floorButtons[floorNumber - 1] = true;
             pressedFloorsQueue.add(floorNumber);
             guiControl.pressPanelButton(carId, floorNumber);
@@ -80,6 +94,7 @@ public class CabinPassengerPanel implements CabinPassengerPanelAPI {
 
     /**
      * Clears all stored pressed floor events.
+     * TODO: Call this in the MUX when the fire alarm is active (either by user or command).
      *  Decide: should this also be called upon button disables or single/multiple mode switches?
      */
     @Override
