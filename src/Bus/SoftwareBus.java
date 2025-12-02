@@ -29,6 +29,7 @@ public class SoftwareBus {
                 for (Subscription s : subscriptions) {
                     if (s.topic() == msg.getTopic() &&
                             (s.subtopic() == 0 || s.subtopic() == msg.getSubTopic())) {
+                        System.out.println("Sent message " +msg);
                         queue.add(msg);
                         break;
                     }

@@ -148,10 +148,10 @@ public class MotionSimulation implements Runnable, Observer {
         if(motor.is_off()&&current_speed==0){
             if(bottom_idx%2==0){
                 elevator.set_y_position(sensor_pos_Map.get(bottom_idx));
-                System.out.println("snapping to "+sensor_pos_Map.get(bottom_idx));
+
             }else if(top_idx!=-1){
                 elevator.set_y_position(sensor_pos_Map.get(top_idx));
-                System.out.println("snapping to "+sensor_pos_Map.get(bottom_idx));
+
             }
         }
 //        if(motor.is_off()&&current_speed==0){
@@ -182,7 +182,7 @@ public class MotionSimulation implements Runnable, Observer {
                 sensor_HashMap.get(idx).set_triggered(true);
                 //System.out.println(sensorY+" "+yBottom);
                // sensor_HashMap.get(idx).triggered = true;
-                System.out.println("Triggered: "+idx);
+
 
                 if(newBottom==-1){
                     newBottom=idx;
@@ -196,7 +196,7 @@ public class MotionSimulation implements Runnable, Observer {
                 sensor_HashMap.get(idx).set_triggered(false);
             }
         }
-        System.out.println("( "+newBottom+", "+newTop + " ) elevator bottom "+yBottom+ " elevator top "+yTop);
+       // System.out.println("( "+newBottom+", "+newTop + " ) elevator bottom "+yBottom+ " elevator top "+yTop);
         top_idx=newTop;
         bottom_idx=newBottom;
 
@@ -273,15 +273,12 @@ public class MotionSimulation implements Runnable, Observer {
         if (viewee instanceof Motor) {
             //System.out.println("Motion sim being updated");
             if (beloved.is_off()) {
-                System.out.println("Motor is off");
                 accelerating_indicator = 0;
                 direction = null;
             } else {
                 if (beloved.get_direction() == Direction.UP) {
-                    System.out.println("Going up");
                     accelerating_indicator = 1;
                 } else {
-                    System.out.println("Going down");
                     accelerating_indicator = -1;
                 }
             }
