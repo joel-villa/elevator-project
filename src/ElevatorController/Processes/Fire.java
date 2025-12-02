@@ -55,6 +55,7 @@ public class Fire {
                 }
 
                 //arrive (open doors, wait, close doors)
+                //TODO this is normal mode logic for arriving, should be different for fire mode
                 if (cabin.arrived() && fireKeyService != null) {
                     notifier.arrivedAtFloor(cabin.currentStatus());
                     ProcessesUtil.arriveProcess(buttons,doorAssembly,notifier,fireKeyService);
