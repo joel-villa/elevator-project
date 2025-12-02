@@ -1,4 +1,4 @@
-package ElevatorController09.Misc;
+package ElevatorController.Misc;
 
 public enum ModeEnum {
     FIRE, NORMAL, CONTROL, OFF, NULL

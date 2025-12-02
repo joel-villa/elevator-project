@@ -1,4 +1,4 @@
-package ElevatorController09.Misc;
+package ElevatorController.Misc;
 
 public record Destination(int floor, int direction) {
     int getFloor() {

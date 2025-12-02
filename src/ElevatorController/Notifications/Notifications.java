@@ -1,4 +1,4 @@
-package ElevatorController09.Notifications;
+package ElevatorController.Notifications;
 
 public class Notifications {
 

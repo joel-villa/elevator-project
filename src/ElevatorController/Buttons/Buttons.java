@@ -1,4 +1,4 @@
-package ElevatorController09.Buttons;
+package ElevatorController.Buttons;
 
 public class Buttons {
 
