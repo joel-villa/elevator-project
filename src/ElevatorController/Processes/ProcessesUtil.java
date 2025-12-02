@@ -49,6 +49,8 @@ public class ProcessesUtil {
         doorAssembly.open();
         Timer timer =new Timer(DOOR_CLOSE_TIMEOUT);
         while (!doorAssembly.fullyOpen()) {
+            //TODO: should we be sleeping rather than waiting for a timeout
+            // I feel like giving up the CPU may be advantageous in this scenario
             if (timer.timeout()) return false;
         }
         return true;
