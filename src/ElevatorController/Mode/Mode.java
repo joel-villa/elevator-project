@@ -40,7 +40,7 @@ public class Mode {
             msg = softwareBus.get(SoftwareBusCodes.setDestination, currentElevator);
         }
 
-        Destination nextDest = new Destination(nextFloor, null);
+        Destination nextDest = new Destination(nextFloor, -1);
         return nextDest;
     }
 }

@@ -189,7 +189,7 @@ public class ElevatorPanel extends VBox {
         row.setPrefSize(90, FLOOR_HEIGHT);
 
         DualDotIndicatorPanel callIndicator = new DualDotIndicatorPanel(floor, this);
-        floorCallIndicators.put(floor, callIndicator);
+        floorCallIndicators.put(Integer.valueOf(floor), callIndicator);
 
         Label floorLabel = new Label(String.valueOf(floor));
         floorLabel.setStyle("-fx-background-color: #404040; -fx-text-fill: white;");
@@ -318,7 +318,7 @@ public class ElevatorPanel extends VBox {
                 else if (assignedFloor < currentFloor) d = Direction.DOWN;
                 else d = Direction.IDLE;
 
-                DualDotIndicatorPanel indicator = floorCallIndicators.get(assignedFloor);
+                DualDotIndicatorPanel indicator = floorCallIndicators.get(Integer.valueOf(assignedFloor));
                 if (indicator != null) {
                     if (d == Direction.UP)  indicator.setDotLit(Direction.UP, true);
                     if (d == Direction.DOWN) indicator.setDotLit(Direction.DOWN, true);
@@ -333,7 +333,7 @@ public class ElevatorPanel extends VBox {
                 boolean open = (body == SoftwareBusCodes.doorOpen);
                 setDoorStatus(open);
                 if (open) {
-                    DualDotIndicatorPanel indicator = floorCallIndicators.get(currentFloor);
+                    DualDotIndicatorPanel indicator = floorCallIndicators.get(Integer.valueOf(currentFloor));
                     if (indicator != null) {
                         indicator.setDotLit(Direction.UP, false);
                         indicator.setDotLit(Direction.DOWN, false);
@@ -364,7 +364,7 @@ public class ElevatorPanel extends VBox {
                 if (!isFireMode && isEnabled) {
                     Direction callDirection = (calledFloor > currentFloor) ? Direction.UP : Direction.DOWN;
 
-                    DualDotIndicatorPanel indicator = floorCallIndicators.get(calledFloor);
+                    DualDotIndicatorPanel indicator = floorCallIndicators.get(Integer.valueOf(calledFloor));
                     if (indicator != null) {
                         indicator.setDotLit(callDirection, true);
                         System.out.println("Elevator " + elevatorId + " hall call: floor " + calledFloor +
@@ -421,7 +421,7 @@ public class ElevatorPanel extends VBox {
     // Helper to clear all call indicators (used on CLEAR FIRE)
     private void clearAllCallIndicators() {
         for (int floor = 1; floor <= 10; floor++) {
-            DualDotIndicatorPanel indicator = floorCallIndicators.get(floor);
+            DualDotIndicatorPanel indicator = floorCallIndicators.get(Integer.valueOf(floor));
             if (indicator != null) {
                 indicator.setDotLit(Direction.UP, false);
                 indicator.setDotLit(Direction.DOWN, false);
