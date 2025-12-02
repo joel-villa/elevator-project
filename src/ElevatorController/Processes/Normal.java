@@ -47,6 +47,7 @@ public class Normal {
             //go to floor of current service
             if (currentService != null) {
                 // update current service in the case of better destinations
+                // TODO: not over-writing destination for some reason
                 currentService = buttons.nextService(cabin.currentStatus());
 
                 // go to the currentService floor

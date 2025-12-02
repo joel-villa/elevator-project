@@ -352,12 +352,17 @@ public class Buttons {
     private void handleFireKey() {
         // Most recent fire key message
         Message message = MessageHelper.pullAllMessages(softwareBus, ELEVATOR_ID, TOPIC_FIRE_KEY);
-
         if (message != null) {
             // If a message exist, use it to update the local fire key variable
             switch (message.getBody()){
-                case BODY_F_KEY_ACTIVE -> fireKey = true;
-                case BODY_F_KEY_INACTIVE -> fireKey = false;
+                case BODY_F_KEY_ACTIVE -> {
+                    fireKey = true;
+                    System.out.println("fire key active in Buttons of Elevator " + ELEVATOR_ID ); //TODO delete (for debuging)
+                }
+                case BODY_F_KEY_INACTIVE -> {
+                    fireKey = false;
+                    System.out.println("fire key inactive in Buttons of Elevator " + ELEVATOR_ID ); //TODO delete (for debuging)
+                }
                 default -> {
                     fireKey = false;
                     System.out.println("Unexpected Body in Buttons, TOPIC_FIRE_KEY, body = " + message.getBody());
