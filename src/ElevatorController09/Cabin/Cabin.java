@@ -1,4 +1,4 @@
-package ElevatorController.Cabin;
+package ElevatorController09.Cabin;
 
 public class Cabin {
 
