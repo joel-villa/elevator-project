@@ -100,10 +100,6 @@ public class Buttons {
         //Floor Button Reset
 
         switch(floorNDirection.floor()){
-//            case UP -> softwareBus.publish(new Message(TOPIC_RESET_CALL, SUBTOPIC_BUILD_MUX, 0));
-//            case DOWN -> softwareBus.publish(new Message(TOPIC_RESET_CALL, SUBTOPIC_BUILD_MUX, 1));
-//            // if direction is not up or down handle with grace!
-//            default -> throw new IllegalStateException("Unexpected value: " + floorNDirection.direction());
             case 1 -> {
                 switch(floorNDirection.direction()) {
                     case UP -> softwareBus.publish(new Message(TOPIC_RESET_CALL, SUBTOPIC_BUILD_MUX, SoftwareBusCodes.reset1Up));
@@ -195,6 +191,7 @@ public class Buttons {
      * Remove that floor from destinations
      * @param floor the floor request button that is no longer relevant
      */
+    //TODO this is currently not being called, seems like an issue
     public void requestReset(int floor) {
         // CALL BUTTONS: are the hall buttons
         // we may want to consider keeping track of what buttons are on with an array of booleans
