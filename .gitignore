@@ -3,6 +3,8 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 .kotlin
+.idea/
+elevator-project.iml
 
 ### Eclipse ###
 .apt_generated
