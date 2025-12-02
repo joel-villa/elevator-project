@@ -4,7 +4,6 @@ import ElevatorController.LowerLevel.*;
 import ElevatorController.Util.FloorNDirection;
 import ElevatorController.Util.State;
 
-//TODO: wherever "Fully closed: true over capacity false obstructed false", is printing please remove it
 /**
  * In fire mode, the elevator only listens to request buttons in the cabin if the fire key has been inserted.
  * Only one service button can be lit up at a time.

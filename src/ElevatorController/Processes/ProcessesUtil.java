@@ -86,8 +86,8 @@ public class ProcessesUtil {
         Timer timer =new Timer(DOOR_CLOSE_TIMEOUT);
 
         boolean lastCommand = true;
-        System.out.println("Fully closed: "+ doorAssembly.fullyClosed()+
-                " over capacity "+ doorAssembly.overCapacity()+ " obstructed "+ doorAssembly.obstructed());
+        // System.out.println("Fully closed: "+ doorAssembly.fullyClosed()+
+        //         " over capacity "+ doorAssembly.overCapacity()+ " obstructed "+ doorAssembly.obstructed());
         while(!doorAssembly.fullyClosed()){
             if(doorAssembly.obstructed()){
                 if (capacity) {
