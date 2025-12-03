@@ -56,6 +56,7 @@ public class SoftwareBusCodes {
     public static final int elevatorStatus = 401;
     public static final int doorStatusCC = 402;
     public static final int ccElevatorDirection = 403;
+    // public static final int fireModeClear = 405;
 
     // List of Subtopics
     public static final int allElevators = 0;

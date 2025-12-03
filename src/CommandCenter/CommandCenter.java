@@ -39,12 +39,13 @@ public class CommandCenter {
 
     private static final int GET_ELEVATOR_STATUS = SoftwareBusCodes.elevatorStatus;
 
-    private static final int GET_MODE = SoftwareBusCodes.fireMode;
+
+    public static final int GET_MODE = SoftwareBusCodes.fireMode;
+    public static final int GET_FIRE_ALARM_STATUS = SoftwareBusCodes.fireAlarmActive;
 
     private static final int GET_DOOR_STATUS = SoftwareBusCodes.doorStatusCC;
 
     private static final int GET_DIRECTION = SoftwareBusCodes.ccElevatorDirection;
-
 
 
     private State currMode = State.NORMAL;
@@ -52,18 +53,22 @@ public class CommandCenter {
     public CommandCenter(SoftwareBus bus){
         this.bus=bus;
         bus.subscribe(GET_MODE,1);
+        bus.subscribe(GET_FIRE_ALARM_STATUS, 0);
         bus.subscribe(GET_ELEVATOR_STATUS, 1);
         bus.subscribe(GET_DOOR_STATUS,1);
         bus.subscribe(GET_DIRECTION, 1);
         bus.subscribe(GET_MODE,2);
+        bus.subscribe(GET_FIRE_ALARM_STATUS, 2);
         bus.subscribe(GET_ELEVATOR_STATUS, 2);
         bus.subscribe(GET_DOOR_STATUS,2);
         bus.subscribe(GET_DIRECTION, 2);
         bus.subscribe(GET_MODE,3);
+        bus.subscribe(GET_FIRE_ALARM_STATUS, 3);
         bus.subscribe(GET_ELEVATOR_STATUS, 3);
         bus.subscribe(GET_DOOR_STATUS,3);
         bus.subscribe(GET_DIRECTION, 3);
         bus.subscribe(GET_MODE,4);
+        bus.subscribe(GET_FIRE_ALARM_STATUS, 4);
         bus.subscribe(GET_ELEVATOR_STATUS, 4);
         bus.subscribe(GET_DOOR_STATUS,4);
         bus.subscribe(GET_DIRECTION, 4);
@@ -94,9 +99,13 @@ public class CommandCenter {
      * Publishes start all elevators
      */
     public void enableElevator(){
-        Arrays.fill(elevatorEnabled,true);
-        System.out.println("In command center; Turning on elevators");
-        bus.publish(new Message(TURN_ELEVATOR_ON_OFF,0,1)); //Turn all elevators on
+        if (currMode == State.CONTROL) {
+            Arrays.fill(elevatorEnabled, true);
+            System.out.println("In command center; Turning on elevators");
+            bus.publish(new Message(TURN_ELEVATOR_ON_OFF, 0, 1)); //Turn all elevators on
+        } else {
+            System.out.println("Hey now you're not in control mode!");
+        }
     }
 
     /**
@@ -105,9 +114,13 @@ public class CommandCenter {
      * @param elevatorId the elevator to be stoped
      */
     public void disableSingleElevator(int elevatorId){
-        System.out.println("In command center; Turning off elevator: "+elevatorId);
-        elevatorEnabled[elevatorId-1]=false;
-        bus.publish(new Message(TURN_ELEVATOR_ON_OFF,elevatorId,0)); //turns elevator off
+        if (currMode == State.CONTROL) {
+            System.out.println("In command center; Turning off elevator: " + elevatorId);
+            elevatorEnabled[elevatorId - 1] = false;
+            bus.publish(new Message(TURN_ELEVATOR_ON_OFF, elevatorId, 0)); //turns elevator off
+        } else {
+            System.out.println("Hey now you're not in control mode!");
+        }
     }
 
     /**
@@ -115,9 +128,13 @@ public class CommandCenter {
      */
 
     public void disableElevator(){
-        System.out.println("In command center; Turning off elevator: ");
-        Arrays.fill(elevatorEnabled,false);
-        bus.publish(new Message(TURN_ELEVATOR_ON_OFF,0,0)); //Turns all elevators off
+        if (currMode == State.CONTROL) {
+            System.out.println("In command center; Turning off elevator: ");
+            Arrays.fill(elevatorEnabled, false);
+            bus.publish(new Message(TURN_ELEVATOR_ON_OFF, 0, 0)); //Turns all elevators off
+        } else {
+            System.out.println("Hey now you're not in control mode!");
+        }
     }
 
     /**
@@ -150,7 +167,14 @@ public class CommandCenter {
      */
     public State getMode() {
         //TODO: hard coded for fire alarm, would need to handle other cases if we are told to switch to other modes
-        if (bus.get(GET_MODE,0) != null) return State.FIRE;
+
+        if (bus.get(GET_MODE,0) != null) {
+            currMode = State.FIRE;
+        }
+        if (bus.get(GET_FIRE_ALARM_STATUS, 0) != null) {
+            System.out.println("hit aoiuwdhaoihwd");
+            currMode = State.NORMAL;
+        }
         return currMode;
     }
 

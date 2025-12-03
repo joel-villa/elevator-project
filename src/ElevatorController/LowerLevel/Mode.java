@@ -28,7 +28,8 @@ public class Mode {
             SoftwareBusCodes.setDestination;
     // From Mode to Command Center
     private static final int TOPIC_NOTIFY_FIRE = SoftwareBusCodes.fireMode;
-
+    private static final int TOPIC_NOTIFY_NO_FIRE = SoftwareBusCodes.clearFire;
+    private static final int TOPIC_FIRE_ALARM_ACTIVE = SoftwareBusCodes.fireAlarmActive;
     // From MUX to Mode
     private static final int TOPIC_FIRE_ALARM =
             SoftwareBusCodes.fireAlarm;
@@ -60,6 +61,7 @@ public class Mode {
         softwareBus.subscribe(TOPIC_MODE, elevatorID);
         softwareBus.subscribe(TOPIC_DESTINATION, elevatorID);
         softwareBus.subscribe(TOPIC_FIRE_ALARM, elevatorID);
+        softwareBus.subscribe(TOPIC_FIRE_ALARM_ACTIVE, elevatorID);
     }
 
     /**
@@ -82,6 +84,7 @@ public class Mode {
 
         // From the MUX, was the fire alarm pulled?
         Message fireMessage =  MessageHelper.pullAllMessages(softwareBus, ELEVATOR_ID, TOPIC_FIRE_ALARM);
+        Message fireAlarmMessage = MessageHelper.pullAllMessages(softwareBus, ELEVATOR_ID, TOPIC_FIRE_ALARM_ACTIVE);
 
         // From the Command Center, On/Off
         Message onOffMessage = MessageHelper.pullAllMessages(softwareBus, ELEVATOR_ID, TOPIC_ON_OFF);
@@ -93,18 +96,28 @@ public class Mode {
             switch (state){
                 case BODY_CENTRALIZED_MODE -> currentMode = State.CONTROL;
                 case BODY_NORMAL_MODE -> currentMode = State.NORMAL;
+                // BODY_FIRE_MODE -> currentMode = State.FIRE;
+                default -> System.out.println("message in mode was null so what");
             }
         }
 
         if(fireMessage!=null){
+            System.out.println("fire message !!!!!!!!!!!!");
             state = fireMessage.getBody();
             if (state == SoftwareBusCodes.pulled){
                 softwareBus.publish(new Message(TOPIC_NOTIFY_FIRE, ELEVATOR_ID,
-                        SoftwareBusCodes.emptyBody));
+                       SoftwareBusCodes.emptyBody));
                 currentMode = State.FIRE;
                 System.out.println("Recieved fire message in Mode");
             }
         }
+
+        if (fireAlarmMessage != null) {
+            System.out.println("CHANGING TO NORMAL IN MODE");
+            softwareBus.publish(new Message(TOPIC_NOTIFY_NO_FIRE, ELEVATOR_ID, SoftwareBusCodes.emptyBody));
+            currentMode = State.NORMAL;
+        }
+
 
         if(onOffMessage!=null){
             state = onOffMessage.getBody();

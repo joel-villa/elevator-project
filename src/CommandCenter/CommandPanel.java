@@ -251,7 +251,7 @@ public class CommandPanel extends GridPane {
         Thread t = new Thread(() -> {
             while (true) {
                 State mode = commandCenter.getMode();
-
+                //System.out.println("Mode just got set to " + mode);
                 Platform.runLater(() -> {
                     switch (mode) {
                         case FIRE:
