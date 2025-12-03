@@ -5,6 +5,7 @@ import Bus.SoftwareBusCodes;
 import ElevatorController.Util.Direction;
 import ElevatorController.Util.FloorNDirection;
 import ElevatorController.Util.State;
+import Message.MessageHelper;
 import Message.Message;
 
 import java.util.ArrayList;
@@ -13,8 +14,8 @@ import java.util.Arrays;
 public class CommandCenter {
 
     private boolean[] elevatorEnabled={true,true,true,true};
-
-    private FloorNDirection[] floorNDirections={null,null,null,null};
+    private final FloorNDirection startingFND = new FloorNDirection(1, Direction.STOPPED);
+    private FloorNDirection[] floorNDirections={startingFND,startingFND,startingFND,startingFND};
 
     //Given to us by a startup
     public SoftwareBus bus;
@@ -42,14 +43,30 @@ public class CommandCenter {
 
     private static final int GET_DOOR_STATUS = SoftwareBusCodes.doorStatusCC;
 
+    private static final int GET_DIRECTION = SoftwareBusCodes.ccElevatorDirection;
+
+
 
     private State currMode = State.NORMAL;
 
     public CommandCenter(SoftwareBus bus){
         this.bus=bus;
-        bus.subscribe(GET_MODE,0);
-        bus.subscribe(GET_ELEVATOR_STATUS, 0);
-        bus.subscribe(GET_DOOR_STATUS,0);
+        bus.subscribe(GET_MODE,1);
+        bus.subscribe(GET_ELEVATOR_STATUS, 1);
+        bus.subscribe(GET_DOOR_STATUS,1);
+        bus.subscribe(GET_DIRECTION, 1);
+        bus.subscribe(GET_MODE,2);
+        bus.subscribe(GET_ELEVATOR_STATUS, 2);
+        bus.subscribe(GET_DOOR_STATUS,2);
+        bus.subscribe(GET_DIRECTION, 2);
+        bus.subscribe(GET_MODE,3);
+        bus.subscribe(GET_ELEVATOR_STATUS, 3);
+        bus.subscribe(GET_DOOR_STATUS,3);
+        bus.subscribe(GET_DIRECTION, 3);
+        bus.subscribe(GET_MODE,4);
+        bus.subscribe(GET_ELEVATOR_STATUS, 4);
+        bus.subscribe(GET_DOOR_STATUS,4);
+        bus.subscribe(GET_DIRECTION, 4);
 
     }
 
@@ -59,6 +76,7 @@ public class CommandCenter {
     public void enableSingleElevator(int elevatorId){
         System.out.println("In command center; Turning on elevator: "+elevatorId);
         elevatorEnabled[elevatorId-1]=true;
+        // TODO: make this message actually work
         bus.publish(new Message(TURN_ELEVATOR_ON_OFF,elevatorId,1)); //turn elevator on
     }
 
@@ -131,7 +149,7 @@ public class CommandCenter {
      * Gets a new mode from software bus if there is one, otherwise returns current mode
      */
     public State getMode() {
-        //hard coded for fire alarm, would need to handle other cases if we are told to switch to other modes
+        //TODO: hard coded for fire alarm, would need to handle other cases if we are told to switch to other modes
         if (bus.get(GET_MODE,0) != null) return State.FIRE;
         return currMode;
     }
@@ -142,16 +160,40 @@ public class CommandCenter {
      * @return current floor and motion of the elevator
      */
     public FloorNDirection getElevatorStatus(int id) {
-        int message = bus.get(GET_ELEVATOR_STATUS,id).getBody();
+        int floor;
+        Direction dir = null;
         FloorNDirection floorNDirection;
-        if (message > 200){
-            floorNDirection= new FloorNDirection(message-200,Direction.UP);
-        }
-        if (message > 100)
-            floorNDirection= new FloorNDirection(message-100,Direction.STOPPED);
-        else
-            floorNDirection= new FloorNDirection(message,Direction.DOWN);
 
+        // Setting floor
+        Message m = MessageHelper.pullAllMessages(bus, id, GET_ELEVATOR_STATUS);
+        if (m == null) {
+            // No change
+            floor = floorNDirections[id - 1].getFloor();
+        } else {
+            System.out.println("litty changing  da floor");
+            // New floor based off messages from sbus
+            floor = m.getBody();
+        }
+
+        // Setting direction
+        m = MessageHelper.pullAllMessages(bus, id, GET_DIRECTION);
+        if (m == null) {
+            // No change
+            dir = floorNDirections[id-1].getDirection();
+        } else {
+            System.out.println("litty changing  da dir");
+            // New direction from software bus
+            int direction = m.getBody();
+
+            switch (direction) {
+                case SoftwareBusCodes.up -> dir = Direction.UP;
+                case SoftwareBusCodes.down -> dir = Direction.DOWN;
+                case SoftwareBusCodes.none -> dir = Direction.STOPPED;
+                default -> System.out.println("unexpected body in command center");
+            }
+        }
+
+        floorNDirection = new FloorNDirection(floor, dir);
         floorNDirections[id-1]=floorNDirection;
         return floorNDirection;
     }
@@ -161,15 +203,14 @@ public class CommandCenter {
      * @param id of the elevator
      * @return 0 for open, 1 for closed, -1 error
      */
-    private int getDoorStatus(int id) {
+    public int getDoorStatus(int id) {
         int message = bus.get(GET_DOOR_STATUS,id).getBody();
         if (message == 0 || message == 1) return message;
         return -1;
     }
 
     public FloorNDirection getFloorNDirection(int id){
-        return floorNDirections[id-1];
+        return getElevatorStatus(id);
     }
-
 
 }

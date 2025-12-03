@@ -53,11 +53,11 @@ public class Notifier {
         //Tell display direction
         int direction = floorNDirection.getDirection().getIntegerVersion();
 
-        // Tell mux what direction we're going
-        softwareBus.publish(new Message(TOPIC_DISPLAY_DIRECTION, ELEVATOR_ID,direction));
-
-        //Tell mux where we are
-        softwareBus.publish(new Message(TOPIC_CABIN_POSITION, ELEVATOR_ID, floorNDirection.floor()));
+//        // Tell mux what direction we're going
+//        softwareBus.publish(new Message(TOPIC_DISPLAY_DIRECTION, ELEVATOR_ID,direction));
+//
+//        //Tell mux where we are
+//        softwareBus.publish(new Message(TOPIC_CABIN_POSITION, ELEVATOR_ID, floorNDirection.floor()));
 
         //Tell CC where we are
         softwareBus.publish(new Message(TOPIC_COMMAND_CENTER, ELEVATOR_ID,
