@@ -103,7 +103,7 @@ public class Buttons {
             case 1 -> {
                 switch(floorNDirection.direction()) {
                     case UP -> softwareBus.publish(new Message(TOPIC_RESET_CALL, SUBTOPIC_BUILD_MUX, SoftwareBusCodes.reset1Up));
-                    case DOWN -> softwareBus.publish(new Message(TOPIC_RESET_CALL, SUBTOPIC_BUILD_MUX, SoftwareBusCodes.reset1Down));
+                    case DOWN -> System.out.println("going down on one????");
                     // if direction is not up or down handle with grace!
                     default -> throw new IllegalStateException("Unexpected value: " + floorNDirection.direction());
                 }
@@ -174,7 +174,7 @@ public class Buttons {
             }
             case 10 -> {
                 switch(floorNDirection.direction()) {
-                    case UP -> softwareBus.publish(new Message(TOPIC_RESET_CALL, SUBTOPIC_BUILD_MUX, SoftwareBusCodes.reset10Up));
+                    case UP -> System.out.println("you can't go up from 10 you silly goose");
                     case DOWN -> softwareBus.publish(new Message(TOPIC_RESET_CALL, SUBTOPIC_BUILD_MUX, SoftwareBusCodes.reset10Down));
                     // if direction is not up or down handle with grace!
                     default -> throw new IllegalStateException("Unexpected value: " + floorNDirection.direction());
