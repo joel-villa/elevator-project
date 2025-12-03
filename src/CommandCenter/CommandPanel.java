@@ -83,7 +83,7 @@ public class CommandPanel extends GridPane {
 //                e -> onFirePressed());
 //        add(fireControlButton, 0, 4, 1, 2);
 
-        autoButton = createButton("AUTO", Color.web("#283593"), 70,
+        autoButton = createButton("CONTROL", Color.web("#283593"), 70,
                 e -> onAutoPressed());
         autoButton.setStyle(colorAuto + " " + buttonBaseStyle + " " + autoBorderOn);
         add(autoButton, 0, 4, 1, 2);
