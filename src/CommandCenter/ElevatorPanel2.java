@@ -30,9 +30,6 @@ import java.util.HashMap;
  *
  * TODO: IMPLEMENT BUTTONS FOR CONTROL MODE (Auto/Manual/Fire)
  * TODO: Fix direction enum naming (currently using GUIDIRECTIONCHGME as workaround)
- * TODO: Implement indicator lights to show active hall calls
- * TODO: Display door status visually
- * TODO: Make direction indicators sync with actual elevator movement
  */
 public class ElevatorPanel2 extends VBox {
 
@@ -387,18 +384,6 @@ public class ElevatorPanel2 extends VBox {
                     });
                 }
 
-                // TODO: Implement call indicator lights
-                //       - Get active hall calls from CommandCenter
-                //       - Light up appropriate dots using setDotLit()
-
-                // TODO: Display door status
-                //       - Get door state from CommandCenter
-                //       - Call setDoorStatus() to update visual
-
-                // TODO: Display active car calls (floor selections)
-                //       - Show which floors are in the service queue
-                //       - Could highlight floor buttons or add indicators
-
                 try {
                     Thread.sleep(20);  // Poll 50 times per second
                 } catch (InterruptedException ignored) {}
@@ -518,77 +503,3 @@ public class ElevatorPanel2 extends VBox {
         return isEnabled;
     }
 }
-
-/*
- * ========== COMPREHENSIVE TODO LIST ==========
- *
- * CRITICAL FIXES:
- * 1. Fix Direction Enum Issue
- *    - Currently using GUIDIRECTIONCHGME as a workaround
- *    - Should standardize on one Direction enum system-wide
- *    - Need to map between ElevatorController.Util.Direction and UI direction
- *
- * HIGH PRIORITY:
- * 2. Implement Hall Call Indicators
- *    - Get active hall calls from CommandCenter
- *    - Light up corresponding dots (UP/DOWN) for each floor
- *    - Should update in real-time as calls are made/serviced
- *
- * 3. Connect Door Status Display
- *    - Get door state from CommandCenter (open/closed)
- *    - Call setDoorStatus() to update visual (white/black border)
- *    - Show door status in real-time
- *
- * 4. Display Active Service Requests
- *    - Show which floors are selected (car calls)
- *    - Could highlight floor buttons differently
- *    - Could add separate indicator lights
- *
- * 5. Sync Direction Indicator with Movement
- *    - Currently only shows IDLE when stopped
- *    - Should show UP/DOWN while elevator is moving
- *    - Need to get direction from CommandCenter during movement
- *
- * MEDIUM PRIORITY:
- * 6. Implement Control Mode Buttons
- *    - Add UI for Auto/Manual/Fire mode selection
- *    - Show current mode visually
- *    - Connect to CommandCenter mode control
- *
- * 7. Fix ON/OFF Sync Issue
- *    - Currently commented out because it caused issues
- *    - Need proper bidirectional sync between UI and CommandCenter
- *    - Prevent conflicts between button toggle and system state
- *
- * 8. Add Visual Feedback for Service Requests
- *    - When floor button is clicked, show confirmation
- *    - Maybe briefly highlight the button or show a message
- *    - Help user know their click was registered
- *
- * LOW PRIORITY:
- * 9. Improve Animation
- *    - Could add easing functions for smoother movement
- *    - Add door opening/closing animations
- *    - Consider adding sound effects
- *
- * 10. Add Queue Display
- *     - Show upcoming stops in order
- *     - Display algorithm being used
- *     - Show estimated time to each floor
- *
- * 11. Better Error Handling
- *     - What if CommandCenter returns null?
- *     - Handle disconnection gracefully
- *     - Show error states visually
- *
- * ARCHITECTURAL IMPROVEMENTS:
- * 12. Reduce Polling Frequency
- *     - 20ms polling (50Hz) might be excessive
- *     - Consider event-based updates instead
- *     - Use listeners/callbacks from CommandCenter
- *
- * 13. Separate UI from Logic
- *     - Consider MVVM or MVC pattern
- *     - Make the panel more testable
- *     - Reduce coupling with CommandCenter
- */
