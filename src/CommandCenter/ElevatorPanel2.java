@@ -371,9 +371,9 @@ public class ElevatorPanel2 extends VBox {
                 FloorNDirection f = commandCenter.getFloorNDirection(elevatorId);
                 GUIDIRECTIONCHGME direction = null;
                 switch (f.direction()){
-                    case Direction.UP -> direction = GUIDIRECTIONCHGME.UP;
-                    case Direction.DOWN -> direction = GUIDIRECTIONCHGME.DOWN;
-                    case Direction.STOPPED -> direction = GUIDIRECTIONCHGME.IDLE;
+                    case UP -> direction = GUIDIRECTIONCHGME.UP;
+                    case DOWN -> direction = GUIDIRECTIONCHGME.DOWN;
+                    case STOPPED -> direction = GUIDIRECTIONCHGME.IDLE;
                     default -> System.out.println("weirdness in starGuiUpdateThread() in ElevatorPanel2");
                 }
                 if (f != null) {

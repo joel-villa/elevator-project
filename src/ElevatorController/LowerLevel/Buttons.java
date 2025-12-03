@@ -340,7 +340,7 @@ public class Buttons {
             // Get the next service if the request type is mutually exclusive
             if (!destinations.isEmpty()){
                 // Can only get first element of non-empty list
-                FloorNDirection nextService = destinations.getFirst();
+                FloorNDirection nextService = destinations.get(0);
                 destinations.clear();
                 destinations.add(nextService); //TODO: this seems incorrect?
                 return nextService;
@@ -354,7 +354,7 @@ public class Buttons {
         if(destinations.isEmpty()){
             return null;
         }
-        int currServiceFloor = destinations.getFirst().getFloor();
+        int currServiceFloor = destinations.get(0).getFloor();
 
         for (FloorNDirection fd : destinations) {
             //Service incompatible
@@ -387,7 +387,7 @@ public class Buttons {
             //Don't getFirst() on empty destinations
             return null;
         }
-        if (inticator == 0) return destinations.getFirst();
+        if (inticator == 0) return destinations.get(0);
         //The humble bubble sort glorious! <- so hot! wowowowow!!
         for (int i = 0; i < destinations.size(); i++) {
             for (int j = 0; j < destinations.size(); j++) {
@@ -403,7 +403,7 @@ public class Buttons {
         //re-add unreachable destinations
         destinations.addAll(unreachable);
 
-        return destinations.getFirst();
+        return destinations.get(0);
     }
     /**
      * Get the fire key message from the MUX
