@@ -4,9 +4,13 @@ import java.util.ArrayList;
 
 import ElevatorController.Util.State;
 import Mux.ElevatorMultiplexor;
+import javafx.animation.RotateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.image.Image;
+import javafx.scene.shape.Circle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.Node;
@@ -22,6 +26,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import Util.imageLoader;
+import javafx.util.Duration;
 
 /** MUX calls api, api modifies the gui. MUX needs to also poll the internal state.
  * Simple JavaFX GUI that listens to model classes via a nested listener
@@ -389,6 +394,7 @@ public class gui {
         private int yTranslation = -53; // adjust as needed for non 1:1 scales
         private int offset = 20;
         private int carId;
+        private ImageView keyGraphic;
 
         private Panel(int index){
             this.carId = index;
@@ -456,21 +462,43 @@ public class gui {
 
                 panelOverlay.getChildren().add(right);
             }
-
+            
+            // Rotating keyhole image:
+            double keyX = 20;
+            double keyY = 163;
+            Image panelImage = elevPanelImg.getImage();
+            Rectangle2D keySrc = new Rectangle2D(364, 885, 76, 76);
+            
+            //ImageView that shows only the key whole
+            keyGraphic = new ImageView(panelImage);
+            keyGraphic.setViewport(keySrc);
+            keyGraphic.setFitWidth(30);   // same as button size
+            keyGraphic.setFitHeight(30);
+            keyGraphic.setTranslateX(keyX);
+            keyGraphic.setTranslateY(keyY);
+            
+            // Clip to a circle
+            Circle keyClip = new Circle(15, 15, 15);
+            keyGraphic.setClip(keyClip);
+            
+            // Put the key graphic on top of the panel image
+            panelOverlay.getChildren().add(keyGraphic);
+            
             Button keyButton = new Button();
             keyButton.setPrefSize(30, 30);
             keyButton.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-
-            double keyX = 20;
-            double keyY = 150;
-
+            
             keyButton.setTranslateX(keyX);
             keyButton.setTranslateY(keyY);
-
+            
             keyButton.setOnAction(event -> {
                 internalState.fireKeys[carId] = !internalState.fireKeys[carId];
+                double targetAngle = internalState.fireKeys[carId] ? 90 : 0;
+                RotateTransition rt = new RotateTransition(Duration.millis(200), keyGraphic);
+                rt.setToAngle(targetAngle);
+                rt.play();
             });
-
+            
             panelOverlay.getChildren().add(keyButton);
 
         }
