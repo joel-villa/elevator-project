@@ -32,6 +32,7 @@ public class ElevatorController {
         while(onOff){
             boolean on = true;
             if (on) {
+                System.out.println(currentMode);
                 switch (currentMode){
                     case NORMAL -> currentMode = normal(mode, buttons, cabin,
                             doorAssembly, notifier);

@@ -136,35 +136,41 @@ public class CommandPanel extends GridPane {
 
 
     //Updated to use command center zz
-    private void onFirePressed() {
-        if ("FIRE".equals(systemMode)) {
-            commandCenter.clearFireMessage();
-            systemMode = "NORMAL";
-//            System.out.println("SET OUT OF FIRE MODE");
-            //publishAll(SoftwareBusCodes.clearFire, 0);          // Clear Fire
-            updateForFireMode(false);
-        } else {
-           // commandCenter.sendModeMessage(SoftwareBusCodes.fire);
-            systemMode = "FIRE";
-            //publishAll(SoftwareBusCodes.setMode, SoftwareBusCodes.fire);  // enter FIRE mode
-            updateForFireMode(true);
-        }
-    }
+//    private void onFirePressed() {
+//        if ("FIRE".equals(systemMode)) {
+//            commandCenter.clearFireMessage();
+//            systemMode = "NORMAL";
+////            System.out.println("SET OUT OF FIRE MODE");
+//            //publishAll(SoftwareBusCodes.clearFire, 0);          // Clear Fire
+//            updateForFireMode(false);
+//        } else {
+//           // commandCenter.sendModeMessage(SoftwareBusCodes.fire);
+//            systemMode = "FIRE";
+//            //publishAll(SoftwareBusCodes.setMode, SoftwareBusCodes.fire);  // enter FIRE mode
+//            updateForFireMode(true);
+//        }
+//    }
 
     private void onAutoPressed() {
         if ("FIRE".equals(systemMode)) return; // ignore during FIRE
 
         //TODO
         if ("NORMAL".equals(systemMode)) {
-            commandCenter.sendModeMessage(SoftwareBusCodes.independent); //NORMAL
-            systemMode = "NORMAL";
-            //publishAll(SoftwareBusCodes.setMode, SoftwareBusCodes.independent);
-            updateForAutoMode("NORMAL");
-        } else {
-            systemMode = "CONTROL";
+            System.out.println("Clicky clicky");
+            //commandCenter.sendModeMessage(SoftwareBusCodes.centralized); //NORMAL
             commandCenter.sendModeMessage(SoftwareBusCodes.centralized);
-            //publishAll(SoftwareBusCodes.setMode, SoftwareBusCodes.centralized);
+            systemMode = "CONTROL";
+            //publishAll(SoftwareBusCodes.setMode, SoftwareBusCodes.independent);
+            //updateForAutoMode("NORMAL");
             updateForAutoMode("CONTROL");
+        } else {
+            systemMode = "NORMAL";
+            System.out.println("Changing it here: "+systemMode);
+            //systemMode = "CONTROL"; zzzz
+            commandCenter.sendModeMessage(SoftwareBusCodes.independent);
+            //publishAll(SoftwareBusCodes.setMode, SoftwareBusCodes.centralized);
+            //updateForAutoMode("CONTROL"); zzzzzz
+            updateForAutoMode("NORMAL");
         }
     }
 
@@ -224,6 +230,7 @@ public class CommandPanel extends GridPane {
         } else {
             modeDisplay.setText("Mode: NORMAL");
             modeDisplay.setStyle(modeDisplayBaseStyle + colorModeIndependent);
+            System.out.println("curr mode is: "+ systemMode);
 //            fireControlButton.setText("TEST FIRE");
 //            fireControlButton.setStyle(colorFire + " " + buttonBaseStyle + " " + fireBtnGlowOff + " -fx-opacity: 1.0;");
             autoButton.setStyle(colorAuto + " " + buttonBaseStyle + " " + autoBorderOn + " -fx-opacity: 1.0;");
@@ -240,6 +247,7 @@ public class CommandPanel extends GridPane {
             modeDisplay.setStyle(modeDisplayBaseStyle + colorModeIndependent);
             autoButton.setStyle(colorAuto + " " + buttonBaseStyle + " " + autoBorderOff + " -fx-opacity: 1.0;");
         }
+        commandCenter.toggleModes(); //TODO: Get rid of maybe
     }
 
     /**

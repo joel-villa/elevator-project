@@ -49,8 +49,9 @@ public class Control {
             if (cabin.arrived()) {
                 System.out.println("****** CABIN ARRIVED *****");
                 notifier.arrivedAtFloor(cabin.currentStatus());
-                ProcessesUtil.arriveProcess(buttons, doorAssembly, notifier,
-                        nextSer);
+//                ProcessesUtil.arriveProcess(buttons, doorAssembly, notifier,
+//                        nextSer); //TODO: call something other than arrive procees. Do we even
+                //need opening doors in control mode?
                 nextSer = null;
             }
         }

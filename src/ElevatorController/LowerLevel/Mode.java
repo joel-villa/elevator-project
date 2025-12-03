@@ -71,6 +71,7 @@ public class Mode {
      */
     public State getMode(){
         setCurrentMode();
+        //System.out.println(currentMode);
         return currentMode;
     }
 
@@ -92,10 +93,17 @@ public class Mode {
 
         int state;
         if(modeMessage!=null){
+          //  System.out.println("Non Null message");
             state = modeMessage.getBody();
             switch (state){
-                case BODY_CENTRALIZED_MODE -> currentMode = State.CONTROL;
-                case BODY_NORMAL_MODE -> currentMode = State.NORMAL;
+                case BODY_CENTRALIZED_MODE -> {
+                    currentMode = State.CONTROL;
+                    System.out.println("SET TO CENTRALIZED");
+                }
+                case BODY_NORMAL_MODE -> {
+                    System.out.println("Setting to norm");
+                    currentMode = State.NORMAL;
+                }
                 // BODY_FIRE_MODE -> currentMode = State.FIRE;
                 default -> System.out.println("message in mode was null so what");
             }

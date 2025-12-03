@@ -151,8 +151,13 @@ public class CommandCenter {
      * Send mode message
      */
     public void sendModeMessage(int modeMessage){
-        System.out.println("In command center; mode message sent");
-        bus.publish(new Message(SET_MODE,0,modeMessage));
+        //currMode =
+        System.out.println("In command center; mode message sent "+modeMessage);
+        bus.publish(new Message(SET_MODE,1,modeMessage));
+        bus.publish(new Message(SET_MODE,2,modeMessage));
+        bus.publish(new Message(SET_MODE,3,modeMessage));
+        bus.publish(new Message(SET_MODE,4,modeMessage));
+
     }
 
     /**
@@ -167,8 +172,8 @@ public class CommandCenter {
      */
     public State getMode() {
         //TODO: hard coded for fire alarm, would need to handle other cases if we are told to switch to other modes
-
-        if (bus.get(GET_MODE,0) != null) {
+        Message message=bus.get(GET_MODE,0);
+        if (message != null) {
             currMode = State.FIRE;
         }
         if (bus.get(GET_FIRE_ALARM_STATUS, 0) != null) {
@@ -176,6 +181,17 @@ public class CommandCenter {
             currMode = State.NORMAL;
         }
         return currMode;
+    }
+
+    public void toggleModes(){
+        if (currMode == State.FIRE){
+            return;
+        }
+        if(currMode==State.CONTROL){
+            currMode=State.NORMAL;
+        }else{
+            currMode=State.CONTROL;
+        }
     }
 
     /**
