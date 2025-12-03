@@ -372,10 +372,18 @@ public class ElevatorPanel2 extends VBox {
                 // ========== POSITION UPDATE ==========
                 // When elevator reaches a floor and stops, update the visual position
                 FloorNDirection f = commandCenter.getFloorNDirection(elevatorId);
-                if (f != null && f.direction() == Direction.STOPPED) {
+                GUIDIRECTIONCHGME direction = null;
+                switch (f.direction()){
+                    case Direction.UP -> direction = GUIDIRECTIONCHGME.UP;
+                    case Direction.DOWN -> direction = GUIDIRECTIONCHGME.DOWN;
+                    case Direction.STOPPED -> direction = GUIDIRECTIONCHGME.IDLE;
+                    default -> System.out.println("weirdness in starGuiUpdateThread() in ElevatorPanel2");
+                }
+                if (f != null) {
+                    GUIDIRECTIONCHGME d = direction;
                     Platform.runLater(() -> {
                         updateCarPosition(f.getFloor(), false);  // Animate to new position
-                        setDirection(GUIDIRECTIONCHGME.IDLE);   // Show idle (no direction)
+                        setDirection(d);   // Show idle (no direction)
                     });
                 }
 

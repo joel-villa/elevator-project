@@ -33,8 +33,16 @@ public class Fire {
         ProcessesUtil.doorClose(doorAssembly,notifier);
 
         FloorNDirection fireKeyService = null;
+        FloorNDirection currentStatus = null;
 
         while (mode.getMode() == State.FIRE){
+            // Update Commmand Center of Cabin floor and direction
+            FloorNDirection newStatus = cabin.currentStatus();
+            if (newStatus != null && !newStatus.equals(currentStatus)){
+                currentStatus = newStatus;
+                notifier.elevatorStatus(currentStatus);
+            }
+
             // While in fire mode do the following:
             if (buttons.fireKeyInserted()){
                 // Fire key inserted -> can accept request button events in the cabin
