@@ -199,10 +199,11 @@ public class ElevatorPanel2 extends VBox {
 
         // ========== CONTROL BUTTON (ON/OFF) ==========
         // NOW UNIFIED: Single button that toggles between ON and OFF
-        mainControlButton = new Button("OFF");
+        mainControlButton = new Button("ON");
         mainControlButton.setStyle("-fx-background-color: #B22222; -fx-text-fill: white;");
         mainControlButton.setPrefWidth(90);
         mainControlButton.setOnAction(e -> toggleLocalRunStop());
+        updateRunStopUI();
 
         // ========== STATUS ROW ==========
         // Contains current floor display and direction indicator
@@ -322,15 +323,14 @@ public class ElevatorPanel2 extends VBox {
      */
     private void updateRunStopUI() {
         if (isEnabled) {
+            mainControlButton.setText("ON");
+            mainControlButton.setStyle("-fx-background-color:#228B22; -fx-text-fill:white;");
+            commandCenter.enableSingleElevator(elevatorId);
+        } else {
             // Elevator is running - show OFF button (red)
             mainControlButton.setText("OFF");
             mainControlButton.setStyle("-fx-background-color:#B22222; -fx-text-fill:white;");
             commandCenter.disableSingleElevator(elevatorId);
-        } else {
-            // Elevator is stopped - show ON button (green)
-            mainControlButton.setText("ON");
-            mainControlButton.setStyle("-fx-background-color:#228B22; -fx-text-fill:white;");
-            commandCenter.enableSingleElevator(elevatorId);
         }
     }
 
@@ -374,7 +374,7 @@ public class ElevatorPanel2 extends VBox {
                 FloorNDirection f = commandCenter.getFloorNDirection(elevatorId);
                 if (f != null && f.direction() == Direction.STOPPED) {
                     Platform.runLater(() -> {
-                        updateCarPosition(f.getFloor(), true);  // Animate to new position
+                        updateCarPosition(f.getFloor(), false);  // Animate to new position
                         setDirection(GUIDIRECTIONCHGME.IDLE);   // Show idle (no direction)
                     });
                 }

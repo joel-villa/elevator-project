@@ -68,8 +68,8 @@ public class ProcessesUtil {
         success = ProcessesUtil.tryDoorClose(doorAssembly,notifier, false);
         if (success) return true;
         while(!success){
-            notifier.playCapacityNoise();
-            success = ProcessesUtil.tryDoorClose(doorAssembly,notifier, true);
+            // notifier.playCapacityNoise();
+            success = ProcessesUtil.tryDoorClose(doorAssembly,notifier, false); //TODO: this was true, feels incorrect
         }
         notifier.stopCapacityNoise();
         return false;

@@ -1,5 +1,6 @@
 package ElevatorController.Processes;
 
+import Bus.SoftwareBusCodes;
 import ElevatorController.LowerLevel.*;
 import ElevatorController.Util.FloorNDirection;
 import ElevatorController.Util.State;
@@ -32,6 +33,7 @@ public class Normal {
         buttons.enableAllRequests();
         ProcessesUtil.doorClose(doorAssembly,notifier);
         FloorNDirection currentService = null;
+        FloorNDirection currentStatus = null;
 
         //TODO: TEST CODE, CURRENTLY HAUNTED OOHOHHHH (call ghost busters)
 //        cabin.gotoFloor(cabin.getID()*2);
@@ -41,6 +43,14 @@ public class Normal {
 
         //Process Requests until state changes
         while (mode.getMode() == State.NORMAL) {
+
+            // Update Commmand Center of Cabin floor and direction
+            FloorNDirection newStatus = cabin.currentStatus();
+            if (newStatus != null && !newStatus.equals(currentStatus)){
+                currentStatus = newStatus;
+                notifier.elevatorStatus(currentStatus);
+            }
+
             //get next service
              currentService = buttons.nextService(cabin.currentStatus());
              //TODO: I think nextService may have scheduling bug (not overwriting to go to closer location)
