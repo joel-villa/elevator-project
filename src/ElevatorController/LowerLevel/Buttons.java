@@ -25,6 +25,9 @@ public class Buttons {
     private Direction currDirection;
     private boolean fireKey = false;
     private RequestType requestType;
+    private int fireLastReq = NO_REQ_BTN;
+
+    private final static int NO_REQ_BTN = -1;
 
     //  *** Software Bus Topics ***
     // Receiving from MUX
@@ -183,6 +186,9 @@ public class Buttons {
             default -> throw new IllegalStateException("Unexpected value: " + floorNDirection.direction());
         }
         destinations.remove(floorNDirection);
+        if (requestType == RequestType.MUTUALLY_EXCLUSIVE) {
+            fireLastReq = NO_REQ_BTN;
+        }
     }
 
     /**
@@ -271,7 +277,7 @@ public class Buttons {
         softwareBus.publish(new Message(TOPIC_REQS_ENABLED, ELEVATOR_ID,
                 SoftwareBusCodes.on));
         softwareBus.publish(new Message(TOPIC_SELECTION_TYPE, ELEVATOR_ID,
-                SoftwareBusCodes.single));
+                SoftwareBusCodes.multiple)); // MUX shouldn't know about this
 
         // Set local variable
 //        this.multipleRequests = false;
@@ -345,16 +351,21 @@ public class Buttons {
         }
 
         if (requestType == RequestType.MUTUALLY_EXCLUSIVE) {
-            // Get the next service if the request type is mutually exclusive
-            if (!destinations.isEmpty()){
-                // Can only get first element of non-empty list
-                FloorNDirection nextService = destinations.get(0);
-                destinations.clear();
-                destinations.add(nextService); //TODO: this seems incorrect?
-                return nextService;
+            if (fireLastReq == NO_REQ_BTN){
+                // NO next request
+                return null;
+            } else {
+                return new FloorNDirection(fireLastReq, null);
             }
+//            // Get the next service if the request type is mutually exclusive
+//            if (!destinations.isEmpty()){
+//                // Can only get first element of non-empty list
+//                FloorNDirection nextService = destinations.get(0);
+//                destinations.clear();
+//                destinations.add(nextService); //TODO: this seems incorrect?
+//                return nextService;
+//            }
             // no nextService -> return null
-            return null;
         }
 
         //Determine floors not on the way
@@ -440,6 +451,7 @@ public class Buttons {
 
     /**
      *  Get the cabin selection button presses from MUX
+     * @return the most recently pressed button (for fire mode)
      */
     private void handleCabinSelect() {
         Message message = softwareBus.get(TOPIC_CABIN_SELECT,ELEVATOR_ID);
@@ -447,6 +459,16 @@ public class Buttons {
             int floor = message.getBody();
             System.out.println("adding to destinations: "+floor);
             destinations.add(new FloorNDirection(floor, null));
+
+            if (requestType == RequestType.MUTUALLY_EXCLUSIVE && floor != fireLastReq){
+                // Turn off old light
+                //Cabin Button Reset
+                softwareBus.publish(new Message(RESET_FLOOR_SELECTION,
+                        ELEVATOR_ID, fireLastReq));
+            }
+
+            fireLastReq = floor;
+
             message=softwareBus.get(TOPIC_CABIN_SELECT,ELEVATOR_ID);
         }
     }
