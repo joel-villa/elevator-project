@@ -78,10 +78,6 @@ public class CommandPanel extends GridPane {
         modeDisplay.setStyle(modeDisplayBaseStyle + colorModeIndependent);
         add(modeDisplay, 0, 2, 1, 2);
 
-        // Buttons  publish messages
-//        fireControlButton = createButton("TEST FIRE", Color.web("#C62828"), 70,
-//                e -> onFirePressed());
-//        add(fireControlButton, 0, 4, 1, 2);
 
         autoButton = createButton("CONTROL", Color.web("#283593"), 70,
                 e -> onAutoPressed());
@@ -98,7 +94,6 @@ public class CommandPanel extends GridPane {
 
         updateButtonStates(true);
 
-        //startBusListener();
 
         updateGUI();
     }
@@ -109,10 +104,7 @@ public class CommandPanel extends GridPane {
     //START BUTTON CLICKED
     private void onStart() {
         systemRunning = true;
-
-        // Starting the command center zz
         commandCenter.enableElevator();
-        //publishAll(SoftwareBusCodes.systemStart, 0); // System Start
         updateButtonStates(true);
     }
 
@@ -152,9 +144,14 @@ public class CommandPanel extends GridPane {
 //    }
 
     private void onAutoPressed() {
-        if ("FIRE".equals(systemMode)) return; // ignore during FIRE
-
-        //TODO
+        if ("FIRE".equals(systemMode)){
+            updateForFireMode(false);
+            systemMode = "NORMAL";
+            commandCenter.toggleModes();
+//            commandCenter.sendModeMessage(SoftwareBusCodes.normal);
+//            updateForAutoMode("NORMAL");
+            return;
+        }
         if ("NORMAL".equals(systemMode)) {
             System.out.println("Clicky clicky");
             //commandCenter.sendModeMessage(SoftwareBusCodes.centralized); //NORMAL
@@ -226,12 +223,15 @@ public class CommandPanel extends GridPane {
         if (isFire) {
             modeDisplay.setText("Mode: FIRE");
             modeDisplay.setStyle(modeDisplayBaseStyle + colorModeFire);
+
 //            fireControlButton.setText("CLEAR FIRE");
 //            fireControlButton.setStyle(colorFire + " " + buttonBaseStyle + " " + fireBtnGlowOn + " -fx-opacity: 1.0;");
         } else {
             modeDisplay.setText("Mode: NORMAL");
             modeDisplay.setStyle(modeDisplayBaseStyle + colorModeIndependent);
-            System.out.println("curr mode is: "+ systemMode);
+            systemMode = "NORMAL";
+            commandCenter.sendModeMessage(SoftwareBusCodes.normal);
+            updateForAutoMode("NORMAL");
 //            fireControlButton.setText("TEST FIRE");
 //            fireControlButton.setStyle(colorFire + " " + buttonBaseStyle + " " + fireBtnGlowOff + " -fx-opacity: 1.0;");
             autoButton.setStyle(colorAuto + " " + buttonBaseStyle + " " + autoBorderOn + " -fx-opacity: 1.0;");
