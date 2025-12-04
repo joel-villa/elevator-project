@@ -41,7 +41,7 @@ public class CommandCenter {
 
 
     public static final int GET_MODE = SoftwareBusCodes.fireMode;
-    public static final int GET_FIRE_ALARM_STATUS = SoftwareBusCodes.fireAlarmActive;
+    //public static final int GET_FIRE_ALARM_STATUS = SoftwareBusCodes.fireAlarmActive;
 
     private static final int GET_DOOR_STATUS = SoftwareBusCodes.doorStatusCC;
 
@@ -53,22 +53,22 @@ public class CommandCenter {
     public CommandCenter(SoftwareBus bus){
         this.bus=bus;
         bus.subscribe(GET_MODE,1);
-        bus.subscribe(GET_FIRE_ALARM_STATUS, 0);
+       // bus.subscribe(GET_FIRE_ALARM_STATUS, 0);
         bus.subscribe(GET_ELEVATOR_STATUS, 1);
         bus.subscribe(GET_DOOR_STATUS,1);
         bus.subscribe(GET_DIRECTION, 1);
         bus.subscribe(GET_MODE,2);
-        bus.subscribe(GET_FIRE_ALARM_STATUS, 2);
+        //bus.subscribe(GET_FIRE_ALARM_STATUS, 2);
         bus.subscribe(GET_ELEVATOR_STATUS, 2);
         bus.subscribe(GET_DOOR_STATUS,2);
         bus.subscribe(GET_DIRECTION, 2);
         bus.subscribe(GET_MODE,3);
-        bus.subscribe(GET_FIRE_ALARM_STATUS, 3);
+        //bus.subscribe(GET_FIRE_ALARM_STATUS, 3);
         bus.subscribe(GET_ELEVATOR_STATUS, 3);
         bus.subscribe(GET_DOOR_STATUS,3);
         bus.subscribe(GET_DIRECTION, 3);
         bus.subscribe(GET_MODE,4);
-        bus.subscribe(GET_FIRE_ALARM_STATUS, 4);
+       // bus.subscribe(GET_FIRE_ALARM_STATUS, 4);
         bus.subscribe(GET_ELEVATOR_STATUS, 4);
         bus.subscribe(GET_DOOR_STATUS,4);
         bus.subscribe(GET_DIRECTION, 4);
@@ -99,13 +99,9 @@ public class CommandCenter {
      * Publishes start all elevators
      */
     public void enableElevator(){
-        if (currMode == State.CONTROL) {
-            Arrays.fill(elevatorEnabled, true);
-            System.out.println("In command center; Turning on elevators");
-            bus.publish(new Message(TURN_ELEVATOR_ON_OFF, 0, 1)); //Turn all elevators on
-        } else {
-            System.out.println("Hey now you're not in control mode!");
-        }
+        Arrays.fill(elevatorEnabled, true);
+        System.out.println("In command center; Turning on elevators");
+        bus.publish(new Message(TURN_ELEVATOR_ON_OFF, 0, 1)); //Turn all elevators on
     }
 
     /**
@@ -114,13 +110,9 @@ public class CommandCenter {
      * @param elevatorId the elevator to be stoped
      */
     public void disableSingleElevator(int elevatorId){
-        if (currMode == State.CONTROL) {
-            System.out.println("In command center; Turning off elevator: " + elevatorId);
-            elevatorEnabled[elevatorId - 1] = false;
-            bus.publish(new Message(TURN_ELEVATOR_ON_OFF, elevatorId, 0)); //turns elevator off
-        } else {
-            System.out.println("Hey now you're not in control mode!");
-        }
+        System.out.println("In command center; Turning off elevator: " + elevatorId);
+        elevatorEnabled[elevatorId - 1] = false;
+        bus.publish(new Message(TURN_ELEVATOR_ON_OFF, elevatorId, 0)); //turns elevator off
     }
 
     /**
@@ -128,13 +120,12 @@ public class CommandCenter {
      */
 
     public void disableElevator(){
-        if (currMode == State.CONTROL) {
-            System.out.println("In command center; Turning off elevator: ");
-            Arrays.fill(elevatorEnabled, false);
-            bus.publish(new Message(TURN_ELEVATOR_ON_OFF, 0, 0)); //Turns all elevators off
-        } else {
-            System.out.println("Hey now you're not in control mode!");
-        }
+        System.out.println("In command center; Turning off elevator: ");
+        Arrays.fill(elevatorEnabled, false);
+        bus.publish(new Message(TURN_ELEVATOR_ON_OFF, 1, 0)); //Turns all elevators off
+        bus.publish(new Message(TURN_ELEVATOR_ON_OFF, 2, 0)); //Turns all elevators off
+        bus.publish(new Message(TURN_ELEVATOR_ON_OFF, 3, 0)); //Turns all elevators off
+        bus.publish(new Message(TURN_ELEVATOR_ON_OFF, 4, 0)); //Turns all elevators off
     }
 
     /**
@@ -164,27 +155,37 @@ public class CommandCenter {
      * Send Service Message
      */
     public void sendServiceMessage(int elevatorID, int floor) {
-        System.out.println("Sent service message for elevator: "+ elevatorID+ " to floor "+ floor);
-        bus.publish(new Message(SERVICE_MESSAGE,elevatorID,floor));
+        if(currMode==State.CONTROL){
+            System.out.println("Sent service message for elevator: "+ elevatorID+ " to floor "+ floor);
+            bus.publish(new Message(SERVICE_MESSAGE,elevatorID,floor));
+        }
+
     }
     /**
      * Gets a new mode from software bus if there is one, otherwise returns current mode
      */
     public State getMode() {
+        //TODO: rewrite, grab from all subtopics, if any are null, -> fire
         //TODO: hard coded for fire alarm, would need to handle other cases if we are told to switch to other modes
-        Message message=bus.get(GET_MODE,0);
-        if (message != null) {
+        //Message secretMessage=bus.get(GET_MODE,0);
+        Message message1=bus.get(GET_MODE,1);
+        Message message2=bus.get(GET_MODE,2);
+        Message message3=bus.get(GET_MODE,3);
+        Message message4=bus.get(GET_MODE,4);
+        if (message1 != null || message2 != null || message3  != null || message4 != null) {
             currMode = State.FIRE;
         }
-        if (bus.get(GET_FIRE_ALARM_STATUS, 0) != null) {
-            System.out.println("hit aoiuwdhaoihwd");
-            currMode = State.NORMAL;
-        }
+
+//        if (bus.get(GET_MODE, 0) != null) {
+//            System.out.println("Oops nevermined no fire");
+//            currMode = State.NORMAL;
+//        }
         return currMode;
     }
 
     public void toggleModes(){
         if (currMode == State.FIRE){
+            currMode=State.NORMAL;
             return;
         }
         if(currMode==State.CONTROL){
@@ -210,7 +211,7 @@ public class CommandCenter {
             // No change
             floor = floorNDirections[id - 1].getFloor();
         } else {
-            System.out.println("litty changing  da floor");
+            //System.out.println("litty changing  da floor");
             // New floor based off messages from sbus
             floor = m.getBody();
         }
@@ -221,7 +222,7 @@ public class CommandCenter {
             // No change
             dir = floorNDirections[id-1].getDirection();
         } else {
-            System.out.println("litty changing  da dir");
+            //System.out.println("litty changing  da dir");
             // New direction from software bus
             int direction = m.getBody();
 
