@@ -110,12 +110,6 @@ public class Cabin implements Runnable {
      * Main thread method, used to step towards a target floor
      */
     private synchronized void stepTowardsDest() {
-        if (ELEVATOR_ID == 7) {
-            System.out.println("MY DEST IS " + currDest);
-            System.out.println("IM AT " + currFloor);
-            System.out.println("My BOT sensor is " + botAlign+ " the humble convert "+sensorToFloor(botAlign));
-            System.out.println("My TOP sensor is " + topAlign+ " the humble convert "+sensorToFloor(topAlign));
-        }
         //Update alignment
         topAlignment();
         bottomAlignment();
@@ -128,7 +122,6 @@ public class Cabin implements Runnable {
         //Should time stop
         if (motor && almostThere) {
             //Time to stop!
-//            System.out.println("ALMOST THERE WOAHHHHHHHHH");
             if (timeToStop != null && timeToStop.timeout()) stopMotor();
             //Determine time to stop
             else if (timeToStop == null) timeToStop = timeStop();
@@ -164,7 +157,6 @@ public class Cabin implements Runnable {
 
     //Wrapper methods for software bus messages
     private void startMotor(Direction direction) {
-        System.out.println("TURNING ON OH GOD OH GOD HOLY SHIT");
         //We set the direction number based on current mux 11/23/2025
         motor = true;
         int dir = -1;

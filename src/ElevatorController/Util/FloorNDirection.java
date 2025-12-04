@@ -25,5 +25,10 @@ public record FloorNDirection(int floor, Direction direction) {
 
     }
 
+    @Override
+    public String toString() {
+        return "Floor: " + floor + " , Direction: " + direction;
+    }
+
 
 }

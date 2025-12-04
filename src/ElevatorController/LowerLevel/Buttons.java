@@ -215,6 +215,7 @@ public class Buttons {
 
         // set local variable
         this.callEnabled = true;
+        destinations.clear();
     }
 
     /**
@@ -232,6 +233,7 @@ public class Buttons {
 
         // Update local
         this.callEnabled = false;
+        destinations.clear();
     }
 
     /**
@@ -252,6 +254,7 @@ public class Buttons {
         // Set local variable
 //        this.multipleRequests = true;
         requestType = RequestType.MULTI_SELECT;
+        destinations.clear();
     }
 
     /**
@@ -272,6 +275,7 @@ public class Buttons {
         // Set local variable
 //        this.multipleRequests = false;
         requestType = RequestType.MUTUALLY_EXCLUSIVE;
+        destinations.clear();
     }
 
     /**
@@ -321,7 +325,10 @@ public class Buttons {
         // Helper calls
         handleCabinSelect();
         handleHallCall();
-//        handleFireKey();
+
+        if(destinations.isEmpty()){
+            return null;
+        }
 
         currDirection = floorNDirection.direction();
         currFloor = floorNDirection.floor();
@@ -351,9 +358,6 @@ public class Buttons {
 
         //Determine floors not on the way
         List<FloorNDirection> unreachable = new ArrayList<>();
-        if(destinations.isEmpty()){
-            return null;
-        }
         int currServiceFloor = destinations.get(0).getFloor();
 
         for (FloorNDirection fd : destinations) {
@@ -382,17 +386,11 @@ public class Buttons {
         // sort decreasing
         else if (currDirection == Direction.DOWN) inticator = -1;
 
-        //If not moving, go to the most recently called floor
-        if (destinations.isEmpty()){
-            //Don't getFirst() on empty destinations
-            return null;
-        }
-        if (inticator == 0) return destinations.get(0);
         //The humble bubble sort glorious! <- so hot! wowowowow!!
         for (int i = 0; i < destinations.size(); i++) {
             for (int j = 0; j < destinations.size(); j++) {
                 if (i == j) continue;
-                if (destinations.get(i).floor() * inticator > destinations.get(j).floor() * inticator) {
+                if (destinations.get(i).floor() * inticator < destinations.get(j).floor() * inticator) {
                     FloorNDirection temp = destinations.get(i);
                     destinations.set(i,destinations.get(j));
                     destinations.set(j,temp);
@@ -400,10 +398,19 @@ public class Buttons {
             }
         }
 
+        //Return choice
+        FloorNDirection choice = null;
+
+        //If not moving, go to the most recently called floor
+        if (inticator == 0 && !destinations.isEmpty()) choice = destinations.get(0);
+
         //re-add unreachable destinations
         destinations.addAll(unreachable);
 
-        return destinations.get(0);
+        //If moving, use scheduled floor
+        if (choice == null) return destinations.get(0);
+
+        return choice;
     }
     /**
      * Get the fire key message from the MUX
@@ -487,5 +494,18 @@ public class Buttons {
         DISABLED,
         MUTUALLY_EXCLUSIVE,
         MULTI_SELECT
+    }
+
+    /**
+     * @return String of destinations queue
+     */
+    String destString() {
+        String dests = "Destination Queue: [";
+        for (FloorNDirection fd : destinations) {
+            dests += fd + ",";
+        }
+        dests = dests.substring(0,dests.length() - 2);
+        dests += "]";
+        return dests;
     }
 }
