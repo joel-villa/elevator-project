@@ -426,7 +426,8 @@ public class gui {
                 left.setOnMouseClicked(event -> {
                     Platform.runLater(() -> {
                         if(!internalState.panelButtonsDisabled[carId]) {
-                            if(!internalState.singleSelection[carId] || internalState.lastSelected == 0) {
+//                            System.out.println("SINGLE SELECTION(left)?  " + internalState.singleSelection[carId]);
+                            if(!internalState.singleSelection[carId] || internalState.lastSelected == 0) { //TODO change multi-select behavior - should override, not ignore
                                 if (elevatorMuxes != null && carId < elevatorMuxes.length && elevatorMuxes[carId] != null) {
                                     elevatorMuxes[carId].getElevator().panel.pressFloorButton(leftFloorNumber);
                                     internalState.lastSelected = leftFloorNumber;
@@ -449,7 +450,8 @@ public class gui {
                 right.setOnMouseClicked(event -> {
                     Platform.runLater(() -> {
                         if(!internalState.panelButtonsDisabled[carId]) {
-                            if(!internalState.singleSelection[carId] || internalState.lastSelected == 0) {
+//                            System.out.println("SINGLE SELECTION(right)?  " + internalState.singleSelection[carId]);
+                            if(!internalState.singleSelection[carId] || internalState.lastSelected == 0) { //TODO change multi-select behavior - should override, not ignore
                                 if (elevatorMuxes != null && carId < elevatorMuxes.length && elevatorMuxes[carId] != null) {
                                     elevatorMuxes[carId].getElevator().panel.pressFloorButton(rightFloorNumber);
                                     internalState.lastSelected = rightFloorNumber;
