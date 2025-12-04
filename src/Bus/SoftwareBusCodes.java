@@ -80,7 +80,7 @@ public class SoftwareBusCodes {
     // List of bodies
     public static final int emptyBody = 0;
     public static final int centralized = 1000;
-    public static final int independent = 1100;
+    //public static final int independent = 1100;
     public static final int fire = 1110;
 
     public static final int doorOpen = 0;

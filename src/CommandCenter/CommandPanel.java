@@ -167,11 +167,12 @@ public class CommandPanel extends GridPane {
             systemMode = "NORMAL";
             System.out.println("Changing it here: "+systemMode);
             //systemMode = "CONTROL"; zzzz
-            commandCenter.sendModeMessage(SoftwareBusCodes.independent);
+            commandCenter.sendModeMessage(SoftwareBusCodes.normal);
             //publishAll(SoftwareBusCodes.setMode, SoftwareBusCodes.centralized);
             //updateForAutoMode("CONTROL"); zzzzzz
             updateForAutoMode("NORMAL");
         }
+        commandCenter.toggleModes();
     }
 
     //LOCAL ui HELPERS
@@ -242,12 +243,12 @@ public class CommandPanel extends GridPane {
             modeDisplay.setText("Mode: CONTROL");
             modeDisplay.setStyle(modeDisplayBaseStyle + colorModeCentral);
             autoButton.setStyle(colorAuto + " " + buttonBaseStyle + " " + autoBorderOn + " -fx-opacity: 1.0;");
-        } else {
+        } else if ("NORMAL".equals(mode)){
             modeDisplay.setText("Mode: NORMAL");
             modeDisplay.setStyle(modeDisplayBaseStyle + colorModeIndependent);
             autoButton.setStyle(colorAuto + " " + buttonBaseStyle + " " + autoBorderOff + " -fx-opacity: 1.0;");
         }
-        commandCenter.toggleModes(); //TODO: Get rid of maybe
+        //TODO: Get rid of maybe
     }
 
     /**
