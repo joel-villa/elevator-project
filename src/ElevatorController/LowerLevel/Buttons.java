@@ -193,10 +193,11 @@ public class Buttons {
      */
     //TODO this is currently not being called, seems like an issue
     public void requestReset(int floor) {
+        destinations.clear();
         // CALL BUTTONS: are the hall buttons
         // we may want to consider keeping track of what buttons are on with an array of booleans
         // this could reduce clutter so we only call publish if the array contains true at the index of the floor
-        softwareBus.publish(new Message(TOPIC_RESET_CALL, ELEVATOR_ID, floor));
+        //softwareBus.publish(new Message(TOPIC_RESET_CALL, ELEVATOR_ID, floor));
     }
 
     /**

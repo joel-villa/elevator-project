@@ -89,12 +89,16 @@ public class Cabin implements Runnable {
      * @return the floor and direction of the elevator
      */
     public FloorNDirection currentStatus(){
-        return new FloorNDirection(currFloor,currDirection);}
+        return new FloorNDirection(currFloor,currDirection);
+    }
 
     /**
      * @return true if the elevator has arrived at its destination
      */
-    public boolean arrived(){return currFloor == currDest;}
+    public boolean arrived(){
+        return currFloor == currDest;
+
+    }
 
     /**
      * @return the current target floor

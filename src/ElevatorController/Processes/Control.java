@@ -16,6 +16,7 @@ public class Control {
     private DoorAssembly doorAssembly;
     private Notifier notifier;
 
+
     /**
      * Create an instance of the Fire Procedure
      * @param mode the mode lower level object
@@ -32,21 +33,32 @@ public class Control {
     public static State control(Mode mode, Buttons buttons, Cabin cabin,
                                 DoorAssembly doorAssembly, Notifier notifier){
         buttons.disableCalls();
-
+        buttons.requestReset(0); //NEHEHEHEEH
         //TODO need to implement some API for resetting Request?
         buttons.enableSingleRequest();
 
         //Close doors
         ProcessesUtil.doorClose(doorAssembly,notifier);
-
+        FloorNDirection currentStatus = null;
         FloorNDirection nextSer = null;
+        boolean playSound = false;
         while(mode.getMode() == State.CONTROL){
             nextSer = mode.nextService();
             if(nextSer != null && cabin.getTargetFloor() != nextSer.floor()){
+                playSound = true;
+                System.out.println("next service isnt null");
                 cabin.gotoFloor(nextSer.floor());
             }
-            //Arrival process (open doors, wait, close doors)
-            if (cabin.arrived()) {
+
+            // Update Commmand Center of Cabin floor and direction
+            FloorNDirection newStatus = cabin.currentStatus();
+            if (newStatus != null && !newStatus.equals(currentStatus)){
+                currentStatus = newStatus;
+                notifier.elevatorStatus(currentStatus);
+            }
+//            Arrival process (open doors, wait, close doors)
+            if (cabin.arrived() && playSound) {
+                playSound = false;
                 System.out.println("****** CABIN ARRIVED *****");
                 notifier.arrivedAtFloor(cabin.currentStatus());
 //                ProcessesUtil.arriveProcess(buttons, doorAssembly, notifier,
