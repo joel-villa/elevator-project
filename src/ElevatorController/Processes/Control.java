@@ -35,6 +35,7 @@ public class Control {
         buttons.disableCalls();
         buttons.requestReset(0); //NEHEHEHEEH
         buttons.disableRequests();
+        cabin.gotoFloor(cabin.currentStatus().getFloor()); // reset where the cabin is going
 
         //TODO need to implement some API for resetting Request?
         buttons.enableSingleRequest();

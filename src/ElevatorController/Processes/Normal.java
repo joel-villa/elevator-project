@@ -34,6 +34,7 @@ public class Normal {
         ProcessesUtil.doorClose(doorAssembly,notifier);
         FloorNDirection currentService = null;
         FloorNDirection currentStatus = null;
+        cabin.gotoFloor(cabin.currentStatus().getFloor()); // go to closest floor
 
         //TODO: TEST CODE, CURRENTLY HAUNTED OOHOHHHH (call ghost busters)
 //        cabin.gotoFloor(cabin.getID()*2);
