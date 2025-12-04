@@ -34,6 +34,8 @@ public class Control {
                                 DoorAssembly doorAssembly, Notifier notifier){
         buttons.disableCalls();
         buttons.requestReset(0); //NEHEHEHEEH
+        buttons.disableRequests();
+
         //TODO need to implement some API for resetting Request?
         buttons.enableSingleRequest();
 
