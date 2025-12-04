@@ -1,6 +1,5 @@
 package CommandCenter;
 
-import ElevatorController.Util.Direction;
 import ElevatorController.Util.FloorNDirection;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -13,7 +12,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.util.Duration;
 
@@ -21,150 +19,50 @@ import java.util.HashMap;
 
 /**
  * ElevatorPanel2 - Enhanced elevator control panel with interactive floor selection
- *
+ * <p>
  * This is a revised version of ElevatorPanel with improvements:
  * - Clickable floor buttons for manual service requests
  * - Single unified START/STOP button
  * - Direct integration with CommandCenter for control
  * - Cleaner layout with better spacing
- *
+ * <p>
  * TODO: IMPLEMENT BUTTONS FOR CONTROL MODE (Auto/Manual/Fire)
  * TODO: Fix direction enum naming (currently using GUIDIRECTIONCHGME as workaround)
  */
 public class ElevatorPanel2 extends VBox {
-
-    // ========== CORE REFERENCES ==========
-    private final CommandCenter commandCenter;    // Central control system reference
-    private final int elevatorId;                 // Unique identifier for this elevator
-
-    // ========== STATE VARIABLES ==========
-    private int currentFloor = 1;                 // Current floor position (1-10)
-    private boolean isDoorOpen = false;           // Door status (true = open)
-    private boolean isEnabled = true;             // System state (true = running)
-    private boolean autoMode = false;             // Control mode (true = automatic)
-    private boolean isFireMode = false;           // Fire recall mode flag
-
-    // ========== DIRECTION ENUM WORKAROUND ==========
-    /**
-     * Local direction enum for UI purposes
-     *
-     * TODO: FIX THIS - Using different enum than the main controller's Direction
-     * This is a temporary workaround because the controller uses its own Direction enum
-     * Should standardize on one Direction enum across the entire system
-     */
-    private enum GUIDIRECTIONCHGME { UP, DOWN, IDLE }
-    private GUIDIRECTIONCHGME currentDirection = GUIDIRECTIONCHGME.IDLE;
-
-    // ========== UI COMPONENTS ==========
-    private Button mainControlButton;             // Combined START/STOP button
-    private StackPane shaftPane;                  // Container for elevator shaft
-    private VBox floorsColumn;                    // Vertical column of floor rows
-    private Pane carPane;                         // Pane containing animated car
-    private VBox movingCar;                       // The elevator car visual element
-    private Label carFloorLabel;                  // Floor number displayed inside car
-    private TranslateTransition animation;        // Animation controller for car movement
-
-    // Map of floor number -> call indicator panel
-    private HashMap<Integer, DualDotIndicatorPanel> floorCallIndicators = new HashMap<>();
-
-    private DirectionIndicatorPanel directionIndicator;  // Up/down triangle display
-    private Label currentFloorDisplay;                   // Large floor number in status area
 
     // ========== LAYOUT CONSTANTS ==========
     private static final double FLOOR_HEIGHT = 30;       // Height of each floor row (pixels)
     private static final double SPACING = 3;             // Gap between floor rows (pixels)
     private static final double TOTAL_HEIGHT = FLOOR_HEIGHT + SPACING;  // Total row height
     private static final double SPEED_PER_FLOOR = 400;   // Animation speed (milliseconds per floor)
+    // ========== CORE REFERENCES ==========
+    private final CommandCenter commandCenter;    // Central control system reference
+    private final int elevatorId;                 // Unique identifier for this elevator
+    // ========== STATE VARIABLES ==========
+    private int currentFloor = 1;                 // Current floor position (1-10)
 
-    // ========== INNER CLASSES ==========
-
-    /**
-     * DualDotIndicatorPanel - Visual indicator for hall call requests
-     *
-     * Displays two colored dots (circles) stacked vertically:
-     * - Upper dot = UP call indicator
-     * - Lower dot = DOWN call indicator
-     *
-     * Dots light up (white) when there's an active call in that direction,
-     * and dim (dark gray) when no call is pending.
-     *
-     * TODO: Make this actually sync with real hall call data from CommandCenter
-     */
-    private class DualDotIndicatorPanel extends VBox {
-        private final Circle upDot = new Circle(3, Color.web("#505050"));      // Top dot (UP calls)
-        private final Circle downDot = new Circle(3, Color.web("#505050"));    // Bottom dot (DOWN calls)
-
-        /**
-         * Creates a new dual-dot indicator panel
-         * Initially both dots are unlit (dark gray)
-         */
-        DualDotIndicatorPanel() {
-            super(6);  // 6px spacing between dots
-            getChildren().addAll(upDot, downDot);
-            setAlignment(Pos.CENTER);
-            setPadding(new Insets(0, 4, 0, 4));
-        }
-
-        /**
-         * Lights or dims a specific direction dot
-         *
-         * @param dir Which direction to update (UP or DOWN)
-         * @param lit True to light up (white), false to dim (dark gray)
-         */
-        void setDotLit(GUIDIRECTIONCHGME dir, boolean lit) {
-            Color c = lit ? Color.WHITE : Color.web("#505050");
-            if (dir == GUIDIRECTIONCHGME.UP) upDot.setFill(c);
-            if (dir == GUIDIRECTIONCHGME.DOWN) downDot.setFill(c);
-        }
-    }
-
-    /**
-     * DirectionIndicatorPanel - Displays elevator's current travel direction
-     *
-     * Shows two triangles stacked vertically:
-     * - Upper triangle (pointing up) = elevator moving UP
-     * - Lower triangle (pointing down) = elevator moving DOWN
-     *
-     * Active triangle lights up white, inactive stays black.
-     *
-     * TODO: Same direction enum issue - should use standard Direction enum
-     */
-    private class DirectionIndicatorPanel extends VBox {
-        private final Polygon upTri;              // Triangle pointing upward
-        private final Polygon downTri;            // Triangle pointing downward
-        private final Color OFF = Color.BLACK;    // Color when not active
-
-        /**
-         * Creates the direction indicator with both triangles
-         * Initially set to IDLE (both triangles dark)
-         */
-        DirectionIndicatorPanel() {
-            super(6);  // 6px spacing between triangles
-            upTri = new Polygon(6,0, 0,8, 12,8);       // Points: center-top, left-bottom, right-bottom
-            downTri = new Polygon(6,8, 0,0, 12,0);     // Points: center-bottom, left-top, right-top
-            setAlignment(Pos.CENTER);
-            setPadding(new Insets(5));
-            setDirection(GUIDIRECTIONCHGME.IDLE);
-            getChildren().addAll(upTri, downTri);
-        }
-
-        /**
-         * Updates which triangle is lit based on current direction
-         *
-         * @param d Direction to display (UP, DOWN, or IDLE)
-         *          IDLE = both triangles dark
-         */
-        void setDirection(GUIDIRECTIONCHGME d) {
-            upTri.setFill(d == GUIDIRECTIONCHGME.UP ? Color.WHITE : OFF);
-            downTri.setFill(d == GUIDIRECTIONCHGME.DOWN ? Color.WHITE : OFF);
-        }
-    }
-
-    // ========== CONSTRUCTOR ==========
-
+    // ========== DIRECTION ENUM WORKAROUND ==========
+    private boolean isDoorOpen = false;           // Door status (true = open)
+    private boolean isEnabled = true;             // System state (true = running)
+    private final boolean autoMode = false;             // Control mode (true = automatic)
+    private final boolean isFireMode = false;           // Fire recall mode flag
+    private GUIDIRECTIONCHGME currentDirection = GUIDIRECTIONCHGME.IDLE;
+    // ========== UI COMPONENTS ==========
+    private final Button mainControlButton;             // Combined START/STOP button
+    private final StackPane shaftPane;                  // Container for elevator shaft
+    private final VBox floorsColumn;                    // Vertical column of floor rows
+    private final Pane carPane;                         // Pane containing animated car
+    private final VBox movingCar;                       // The elevator car visual element
+    private final Label carFloorLabel;                  // Floor number displayed inside car
+    private final TranslateTransition animation;        // Animation controller for car movement
+    // Map of floor number -> call indicator panel
+    private final HashMap<Integer, DualDotIndicatorPanel> floorCallIndicators = new HashMap<>();
+    private final DirectionIndicatorPanel directionIndicator;  // Up/down triangle display
+    private final Label currentFloorDisplay;                   // Large floor number in status area
     /**
      * Constructs a new ElevatorPanel2 with full UI and control integration
-     *
+     * <p>
      * Creates the complete interface including:
      * - Title label with elevator ID
      * - Single ON/OFF control button
@@ -172,7 +70,7 @@ public class ElevatorPanel2 extends VBox {
      * - Interactive elevator shaft with clickable floor buttons
      * - Animated elevator car
      * - Hall call indicators for each floor
-     *
+     * <p>
      * Key improvements over ElevatorPanel:
      * - Floor buttons are now clickable to request service
      * - Simplified START/STOP into single toggle button
@@ -256,14 +154,14 @@ public class ElevatorPanel2 extends VBox {
         startGuiUpdateThread();
     }
 
-    // ========== FLOOR ROW CREATION ==========
+    // ========== INNER CLASSES ==========
 
     /**
      * Creates a single interactive floor row for the elevator shaft
-     *
+     * <p>
      * NEW FEATURE: Floor buttons are now CLICKABLE!
      * Clicking a floor button sends a service request to that floor
-     *
+     * <p>
      * Each row contains:
      * - DualDotIndicatorPanel (up/down call lights)
      * - Clickable floor number button
@@ -294,11 +192,9 @@ public class ElevatorPanel2 extends VBox {
         return row;
     }
 
-    // ========== CONTROL BUTTON HANDLERS ==========
-
     /**
      * Toggles the elevator between running (ON) and stopped (OFF) states
-     *
+     * <p>
      * This is a LOCAL toggle that:
      * 1. Flips the isEnabled flag
      * 2. Updates the button appearance
@@ -309,13 +205,15 @@ public class ElevatorPanel2 extends VBox {
         updateRunStopUI();
     }
 
+    // ========== CONSTRUCTOR ==========
+
     /**
      * Updates the control button's appearance and notifies CommandCenter
-     *
+     * <p>
      * Button states:
      * - Enabled  → "OFF" button (red) - clicking will turn off
      * - Disabled → "ON" button (green) - clicking will turn on
-     *
+     * <p>
      * Also sends corresponding enable/disable commands to CommandCenter
      */
     private void updateRunStopUI() {
@@ -331,20 +229,20 @@ public class ElevatorPanel2 extends VBox {
         }
     }
 
-    // ========== BACKGROUND UPDATE THREAD ==========
+    // ========== FLOOR ROW CREATION ==========
 
     /**
      * Starts a background daemon thread to continuously sync UI with CommandCenter
-     *
+     * <p>
      * This replaces the old "bus update" mechanism with direct CommandCenter polling
-     *
+     * <p>
      * The thread continuously:
      * 1. Checks if elevator state changed (commented out - was causing issues)
      * 2. Updates elevator position when it reaches a floor (STOPPED state)
      * 3. Updates direction indicator to IDLE when stopped
-     *
+     * <p>
      * Polling interval: 20ms (50 times per second)
-     *
+     * <p>
      * TODO: Implement indicator lights for active hall calls
      * TODO: Display door open/closed status
      * TODO: Show which floors have active service requests
@@ -370,11 +268,12 @@ public class ElevatorPanel2 extends VBox {
                 // When elevator reaches a floor and stops, update the visual position
                 FloorNDirection f = commandCenter.getFloorNDirection(elevatorId);
                 GUIDIRECTIONCHGME direction = null;
-                switch (f.direction()){
+                switch (f.direction()) {
                     case UP -> direction = GUIDIRECTIONCHGME.UP;
                     case DOWN -> direction = GUIDIRECTIONCHGME.DOWN;
                     case STOPPED -> direction = GUIDIRECTIONCHGME.IDLE;
-                    default -> System.out.println("weirdness in starGuiUpdateThread() in ElevatorPanel2");
+                    default ->
+                            System.out.println("weirdness in starGuiUpdateThread() in ElevatorPanel2");
                 }
                 if (f != null) {
                     GUIDIRECTIONCHGME d = direction;
@@ -386,30 +285,31 @@ public class ElevatorPanel2 extends VBox {
 
                 try {
                     Thread.sleep(20);  // Poll 50 times per second
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException ignored) {
+                }
             }
         });
         t.setDaemon(true);  // Thread dies when application closes
         t.start();
     }
 
-    // ========== POSITION AND ANIMATION ==========
+    // ========== CONTROL BUTTON HANDLERS ==========
 
     /**
      * Updates the elevator car's visual position to a specific floor
-     *
+     * <p>
      * This method:
      * 1. Calculates the vertical position based on floor number
      * 2. Updates both display labels (status and car)
      * 3. Either animates the movement or instantly moves the car
-     *
+     * <p>
      * Floor positioning:
      * - Floor 10 (top) = Y position 0
      * - Floor 1 (bottom) = Y position (9 * TOTAL_HEIGHT)
-     *
+     * <p>
      * Animation speed is proportional to distance traveled
      *
-     * @param floor The target floor number (1-10)
+     * @param floor       The target floor number (1-10)
      * @param animateFlag True = smooth animation, False = instant jump
      */
     private void updateCarPosition(int floor, boolean animateFlag) {
@@ -445,15 +345,15 @@ public class ElevatorPanel2 extends VBox {
         directionIndicator.setDirection(dir);
     }
 
-    // ========== DOOR STATUS ==========
+    // ========== BACKGROUND UPDATE THREAD ==========
 
     /**
      * Updates the visual representation of door status
-     *
+     * <p>
      * Door status is shown by changing the elevator car's border color:
      * - Open doors = WHITE border (more visible)
      * - Closed doors = BLACK border (blends in)
-     *
+     * <p>
      * TODO: Hook this up to actual door state from CommandCenter
      *       Currently this method exists but is never called
      *
@@ -466,7 +366,7 @@ public class ElevatorPanel2 extends VBox {
                 color + "; -fx-border-width:0 2 0 2;");
     }
 
-    // ========== GETTERS ==========
+    // ========== POSITION AND ANIMATION ==========
 
     /**
      * @return Current floor number the elevator is on (1-10)
@@ -482,12 +382,16 @@ public class ElevatorPanel2 extends VBox {
         return isDoorOpen;
     }
 
+    // ========== DOOR STATUS ==========
+
     /**
      * @return True if elevator is in automatic mode
      */
     public boolean isAutoMode() {
         return autoMode;
     }
+
+    // ========== GETTERS ==========
 
     /**
      * @return True if elevator is in fire recall mode
@@ -501,5 +405,91 @@ public class ElevatorPanel2 extends VBox {
      */
     public boolean isEnabled() {
         return isEnabled;
+    }
+
+    /**
+     * Local direction enum for UI purposes
+     * <p>
+     * TODO: FIX THIS - Using different enum than the main controller's Direction
+     * This is a temporary workaround because the controller uses its own Direction enum
+     * Should standardize on one Direction enum across the entire system
+     */
+    private enum GUIDIRECTIONCHGME {UP, DOWN, IDLE}
+
+    /**
+     * DualDotIndicatorPanel - Visual indicator for hall call requests
+     * <p>
+     * Displays two colored dots (circles) stacked vertically:
+     * - Upper dot = UP call indicator
+     * - Lower dot = DOWN call indicator
+     * <p>
+     * Dots light up (white) when there's an active call in that direction,
+     * and dim (dark gray) when no call is pending.
+     * <p>
+     * TODO: Make this actually sync with real hall call data from CommandCenter
+     */
+    private class DualDotIndicatorPanel extends VBox {
+
+        /**
+         * Creates a new dual-dot indicator panel
+         * Initially both dots are unlit (dark gray)
+         */
+        DualDotIndicatorPanel() {
+            super(6);  // 6px spacing between dots
+            setAlignment(Pos.CENTER);
+            setPadding(new Insets(0, 4, 0, 4));
+        }
+
+        /**
+         * Lights or dims a specific direction dot
+         *
+         * @param dir Which direction to update (UP or DOWN)
+         * @param lit True to light up (white), false to dim (dark gray)
+         */
+        void setDotLit(GUIDIRECTIONCHGME dir, boolean lit) {
+            Color c = lit ? Color.WHITE : Color.web("#505050");
+        }
+    }
+
+    /**
+     * DirectionIndicatorPanel - Displays elevator's current travel direction
+     * <p>
+     * Shows two triangles stacked vertically:
+     * - Upper triangle (pointing up) = elevator moving UP
+     * - Lower triangle (pointing down) = elevator moving DOWN
+     * <p>
+     * Active triangle lights up white, inactive stays black.
+     * <p>
+     * TODO: Same direction enum issue - should use standard Direction enum
+     */
+    private class DirectionIndicatorPanel extends VBox {
+        private final Polygon upTri;              // Triangle pointing upward
+        private final Polygon downTri;            // Triangle pointing downward
+        private final Color OFF = Color.BLACK;    // Color when not active
+
+        /**
+         * Creates the direction indicator with both triangles
+         * Initially set to IDLE (both triangles dark)
+         */
+        DirectionIndicatorPanel() {
+            super(6);  // 6px spacing between triangles
+            upTri = new Polygon(6, 0, 0, 8, 12, 8);       // Points: center-top, left-bottom, right-bottom
+            downTri = new Polygon(6, 8, 0, 0, 12, 0);     // Points: center-bottom, left-top, right-top
+            setAlignment(Pos.CENTER);
+            setPadding(new Insets(5));
+            setDirection(GUIDIRECTIONCHGME.IDLE);
+            getChildren().addAll(upTri, downTri);
+        }
+
+        /**
+         * Updates which triangle is lit based on current direction
+         *
+         * @param d Direction to display (UP, DOWN, or IDLE)
+         *          IDLE = both triangles dark
+         */
+        void setDirection(GUIDIRECTIONCHGME d) {
+            upTri.setFill(d == GUIDIRECTIONCHGME.UP ? Color.WHITE : OFF);
+            downTri.setFill(d == GUIDIRECTIONCHGME.DOWN ? Color.WHITE : OFF);
+        }
     }
 }

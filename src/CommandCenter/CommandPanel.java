@@ -2,7 +2,6 @@ package CommandCenter;
 
 import Bus.SoftwareBusCodes;
 import ElevatorController.Util.State;
-import Message.Message;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -16,29 +15,18 @@ import javafx.scene.paint.Color;
 
 public class CommandPanel extends GridPane {
 
-    private CommandCenter commandCenter;
-
     // UI controls
     private final Label modeDisplay;
     private final Button autoButton;
-    //private final Button fireControlButton;
-    private final Button startButton;
-    private final Button stopButton;
-
-    // Local UI state (purely visual)
-    private boolean systemRunning = true;
-    private String systemMode = "NORMAL"; // CENTRALIZED | NORMAL | FIRE
-
     // Styling
     private final String modeDisplayBaseStyle =
             "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; " +
                     "-fx-alignment: center; -fx-background-radius: 14; -fx-padding: 6 10 6 10;";
-
+    //private final Button fireControlButton;
     private final String buttonBaseStyle =
             "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; " +
                     "-fx-background-radius: 14; -fx-padding: 6 10 6 10; " +
                     "-fx-border-radius: 14; -fx-border-width: 1; -fx-border-color: rgba(255,255,255,0.15);";
-
     private final String colorModeCentral = "-fx-background-color: #00695C;";
     private final String colorModeIndependent = "-fx-background-color: #424242;";
     private final String colorModeFire = "-fx-background-color: #D32F2F;";
@@ -46,15 +34,18 @@ public class CommandPanel extends GridPane {
     private final String colorAuto = "-fx-background-color: #283593;";
     private final String colorStart = "-fx-background-color: #2E7D32;";
     private final String colorStop = "-fx-background-color: #B71C1C;";
-    private final String autoBorderOn  = "-fx-border-color: #FFEB3B;";
+    private final String autoBorderOn = "-fx-border-color: #FFEB3B;";
     private final String autoBorderOff = "-fx-border-color: rgba(255,255,255,0.10);";
-    private final String fireBtnGlowOn  = "-fx-effect: dropshadow(gaussian, rgba(255,193,7,0.7), 18, 0.4, 0, 0);";
+    private final String fireBtnGlowOn = "-fx-effect: dropshadow(gaussian, rgba(255,193,7,0.7), 18, 0.4, 0, 0);";
     private final String fireBtnGlowOff = "-fx-effect: none;";
-
+    private final CommandCenter commandCenter;
+    // Local UI state (purely visual)
+    private boolean systemRunning = true;
+    private String systemMode = "NORMAL"; // CENTRALIZED | NORMAL | FIRE
 
 
     public CommandPanel(CommandCenter commandCenter) {
-        this.commandCenter=commandCenter;
+        this.commandCenter = commandCenter;
         // Layout grid
         setStyle("-fx-background-color: #333333;");
         setPadding(new Insets(20, 24, 20, 24));
@@ -84,20 +75,19 @@ public class CommandPanel extends GridPane {
         autoButton.setStyle(colorAuto + " " + buttonBaseStyle + " " + autoBorderOn);
         add(autoButton, 0, 4, 1, 2);
 
-        startButton = createButton("START", Color.web("#2E7D32"), 70,
-                e -> onStart());
-        add(startButton, 0, 6, 1, 2);
-
-        stopButton = createButton("STOP", Color.web("#B71C1C"), 70,
-                e -> onStop());
-        add(stopButton, 0, 8, 1, 2);
+//        startButton = createButton("START", Color.web("#2E7D32"), 70,
+//                e -> onStart());
+//        add(startButton, 0, 6, 1, 2);
+//
+//        stopButton = createButton("STOP", Color.web("#B71C1C"), 70,
+//                e -> onStop());
+//        add(stopButton, 0, 8, 1, 2);
 
         updateButtonStates(true);
 
 
         updateGUI();
     }
-
 
 
     //button handlers
@@ -132,7 +122,8 @@ public class CommandPanel extends GridPane {
 //        if ("FIRE".equals(systemMode)) {
 //            commandCenter.clearFireMessage();
 //            systemMode = "NORMAL";
-////            System.out.println("SET OUT OF FIRE MODE");
+
+    /// /            System.out.println("SET OUT OF FIRE MODE");
 //            //publishAll(SoftwareBusCodes.clearFire, 0);          // Clear Fire
 //            updateForFireMode(false);
 //        } else {
@@ -142,9 +133,8 @@ public class CommandPanel extends GridPane {
 //            updateForFireMode(true);
 //        }
 //    }
-
     private void onAutoPressed() {
-        if ("FIRE".equals(systemMode)){
+        if ("FIRE".equals(systemMode)) {
             updateForFireMode(false);
             systemMode = "NORMAL";
             commandCenter.toggleModes();
@@ -162,7 +152,7 @@ public class CommandPanel extends GridPane {
             updateForAutoMode("CONTROL");
         } else {
             systemMode = "NORMAL";
-            System.out.println("Changing it here: "+systemMode);
+            System.out.println("Changing it here: " + systemMode);
             //systemMode = "CONTROL"; zzzz
             commandCenter.sendModeMessage(SoftwareBusCodes.normal);
             //publishAll(SoftwareBusCodes.setMode, SoftwareBusCodes.centralized);
@@ -197,15 +187,11 @@ public class CommandPanel extends GridPane {
     }
 
     public void updateButtonStates(boolean isRunning) {
-        startButton.setDisable(isRunning);
-        stopButton.setDisable(!isRunning);
         //fireControlButton.setDisable(!isRunning);
         autoButton.setDisable(!isRunning);
 
         // keep labels readable even when disabled
         String keepOpacity = " -fx-opacity: 1.0;";
-        startButton.setStyle(startButton.getStyle() + keepOpacity);
-        stopButton.setStyle(stopButton.getStyle() + keepOpacity);
         //fireControlButton.setStyle(fireControlButton.getStyle() + keepOpacity);
         autoButton.setStyle(autoButton.getStyle() + keepOpacity);
     }
@@ -243,7 +229,7 @@ public class CommandPanel extends GridPane {
             modeDisplay.setText("Mode: CONTROL");
             modeDisplay.setStyle(modeDisplayBaseStyle + colorModeCentral);
             autoButton.setStyle(colorAuto + " " + buttonBaseStyle + " " + autoBorderOn + " -fx-opacity: 1.0;");
-        } else if ("NORMAL".equals(mode)){
+        } else if ("NORMAL".equals(mode)) {
             modeDisplay.setText("Mode: NORMAL");
             modeDisplay.setStyle(modeDisplayBaseStyle + colorModeIndependent);
             autoButton.setStyle(colorAuto + " " + buttonBaseStyle + " " + autoBorderOff + " -fx-opacity: 1.0;");
@@ -252,11 +238,11 @@ public class CommandPanel extends GridPane {
     }
 
     /**
-     *Replacing the bus poll, updates the GUI  zz
+     * Replacing the bus poll, updates the GUI  zz
      */
 
 
-    private void updateGUI(){
+    private void updateGUI() {
         Thread t = new Thread(() -> {
             while (true) {
                 State mode = commandCenter.getMode();
@@ -289,7 +275,8 @@ public class CommandPanel extends GridPane {
                 });
                 try {
                     Thread.sleep(10);
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException ignored) {
+                }
             }
         });
         t.setDaemon(true);
